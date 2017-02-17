@@ -1,47 +1,20 @@
 const 	express = require('express'),
 		router	= module.exports = express.Router(),
-		Race	= require('../../models/race')
+		Race = require('../../models/race')
 
-router.param('raceId', (req, res, next, raceId) => {
-	Race.findById(raceId, 'name description meta')
-	.then(result => {
-		req.requestedRaceId = raceId
-
-		if(result === null) {
-			let error = new Error('Race not found')
-			error.status = 404
-			throw error
-		} else {
-			req.race = result
-			next()
-		}
-	})
-	.catch(err => {
-		next(err)
-	})
-})
-
-// GET /api/users
+// GET /api/races
 router.get('/', (req, res, next) => {
-	let opt = {isActive: true},
-		proj = 'name description'
-
-	if(req.query.showInactive) {
-		opt = {}
-		proj += ' isActive'
-	}
-
-	Race.find(opt, proj).then(data => {
+	Race.find({}, "_id name description").then(data => {
 		res.json(data)
 	})
 })
 
-// GET /api/users/:raceId
+// GET /api/races/:raceId
 router.get('/:raceId', (req, res, next) => {
 	res.json(req.race)
 })
 
-// POST /api/users
+// POST /api/races
 router.post('/', (req, res, next) => {
 	let race = new Race({ name: req.body.name, description: req.body.description })
 
@@ -55,13 +28,13 @@ router.post('/', (req, res, next) => {
 	})
 })
 
-// DELETE /api/users/:raceId
+// DELETE /api/races/:raceId
 router.delete('/:raceId', (req, res, next) => {
 	Race.update()
 	Race.findByIdAndRemove(req.requestedRaceId)
 })
 
-// PATCH /api/users/:raceId
+// PATCH /api/races/:raceId
 router.patch('/:raceId', (req, res, next) => {
 	Race.findByIdAndUpdate(req.requestedRaceId)
 })

@@ -6,12 +6,13 @@ const 	express 	= require('express'),
 		bodyParser 	= require('body-parser'),
 		{connectDb}	= require('./data')
 
+
 // connect data layer
 connectDb('rest-race')
 
 // setup view engine
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'pug')
 
 // setup middleware
 app.use(bodyParser.json())
@@ -20,8 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 // setup routes middleware
 app.use('/', require('./routes/index'))
-app.use('/api/users', require('./routes/api/users'))
-app.use('/api/races', require('./routes/api/races'))
+app.use('/api', require('./routes/api'))
 
 // setup final middleware
 app.use((req, res, next) => {
@@ -34,8 +34,13 @@ app.use((req, res, next) => {
 // setup global error handler
 app.use((err, req, res, next) => {
 	let status = err.status || 500
+
 	res.status(status)
-	res.render('error', { message: err.message, status })
+	if(req.isApiCall) {
+		res.json({ error: typeof err, message: err.message, status })
+	} else {
+		res.render('error', { message: err.message, status })
+	}
 })
 
 // export final express app

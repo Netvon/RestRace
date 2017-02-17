@@ -1,6 +1,7 @@
-const 	mongoose 	= require('mongoose'),
-		slug 		= require('mongoose-document-slugs'),
-		name 		= 'Race',
+/// <reference path="typings/index.d.ts" />
+
+const	mongoose	= require('mongoose'),
+		slug		= require('mongoose-document-slugs'),
 
 raceSchema = new mongoose.Schema({
 	name: { type: String, required: true},
@@ -13,6 +14,8 @@ raceSchema = new mongoose.Schema({
 			values: ['notstarted', 'started', 'ended']
 		}
 	},
+
+	tags: [String],
 	
 	meta: {
 		createdOn: { type: Date, default: Date.now },
@@ -22,4 +25,4 @@ raceSchema = new mongoose.Schema({
 
 raceSchema.plugin(slug, { sourceField: 'name' })
 
-module.exports = mongoose.model(name, raceSchema)
+module.exports =  mongoose.model('Race', raceSchema)
