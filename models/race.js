@@ -1,9 +1,9 @@
-/// <reference path="typings/index.d.ts" />
 
 const	mongoose	= require('mongoose'),
 		slug		= require('mongoose-document-slugs'),
+		Schema		= mongoose.Schema;
 
-raceSchema = new mongoose.Schema({
+var raceSchema = new mongoose.Schema({
 	name: { type: String, required: true},
 	description: String,
 
@@ -15,6 +15,19 @@ raceSchema = new mongoose.Schema({
 		}
 	},
 
+    pubs: [{
+        type: Schema.ObjectId, ref:"Pub"
+    }],
+
+    teams: {
+        type: [{ teamId:Schema.ObjectId }]
+    },
+
+    starttime: {
+        type: Date,
+        required: true,
+    },
+
 	tags: [String],
 	
 	meta: {
@@ -25,4 +38,4 @@ raceSchema = new mongoose.Schema({
 
 raceSchema.plugin(slug, { sourceField: 'name' })
 
-module.exports =  mongoose.model('Race', raceSchema)
+mongoose.model('Race', raceSchema)

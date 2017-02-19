@@ -10,6 +10,12 @@ const 	express 	= require('express'),
 // connect data layer
 connectDb('rest-race')
 
+// import models
+require('./models/race');
+require('./models/user');
+require('./models/team');
+require('./models/pub');
+
 // setup view engine
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
