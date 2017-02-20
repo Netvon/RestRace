@@ -9,3 +9,5 @@ router.use('*', (req, res, next) => {
 
 router.use('/races', require('./races'))
 router.use('/users', require('./users'))
+router.use('/pubs', require('./pubs'))
+router.use('/teams', require('./teams'))

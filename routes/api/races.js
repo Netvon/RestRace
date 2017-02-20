@@ -1,12 +1,12 @@
 
 
-var express = require('express'),
+const express = require('express'),
 	router	= module.exports = express.Router(),
 	mongoose = require('mongoose'),
 	Race = mongoose.model('Race');
 
 
-function getRaces(req, res){
+function getRaces(req, res, next){
     var query = {};
     if(req.params.raceId){
         query._id = req.params.raceId;
@@ -23,7 +23,7 @@ function getRaces(req, res){
         })
 }
 
-function addRace(req, res){
+function addRace(req, res, next){
 
     let race = new Race({
         name: req.body.name,
@@ -43,7 +43,7 @@ function addRace(req, res){
 }
 
 
-function deleteRace(req, res){
+function deleteRace(req, res, next){
 
     Race.findByIdAndRemove(req.params.raceId, function(err, response){
         if(err){
@@ -55,7 +55,7 @@ function deleteRace(req, res){
 
 }
 
-function updateRace(req, res){
+function updateRace(req, res, next){
 
     Race.findByIdAndUpdate(req.params.raceId, req.body)
         .then(({_id, name, description, starttime }) => {
@@ -73,21 +73,13 @@ function updateRace(req, res){
 
 // GET /api/races
 // GET /api/races/:raceId
-router.get('/:raceId?', (req, res, next) => {
-    getRaces(req,res)
-})
+router.get('/:raceId?', getRaces)
 
 // POST /api/races
-router.post('/', (req, res, next) => {
-    addRace(req,res)
-})
+router.post('/', addRace)
 
 // DELETE /api/races/:raceId
-router.delete('/:raceId', (req, res, next) => {
-	deleteRace(req,res)
-})
+router.delete('/:raceId', deleteRace)
 
 // PATCH /api/races/:raceId
-router.patch('/:raceId', (req, res, next) => {
-	updateRace(req,res)
-})
+router.patch('/:raceId', updateRace)
