@@ -5,6 +5,11 @@ const	mongoose	= require('mongoose'),
 
 var teamSchema = new mongoose.Schema({
 
+
+    name:{
+        type: String
+    },
+
     users: [{
         type: Schema.ObjectId, ref:"User"
     }],
@@ -17,7 +22,7 @@ var teamSchema = new mongoose.Schema({
 
     endtime: {
         type: Date,
-        required: true,
+        // required: true,
     },
 
     tags: [String],

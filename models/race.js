@@ -19,9 +19,9 @@ var raceSchema = new mongoose.Schema({
         type: Schema.ObjectId, ref:"Pub"
     }],
 
-    teams: {
-        type: [{ teamId:Schema.ObjectId }]
-    },
+    teams: [{
+        type: Schema.ObjectId, ref:"Team"
+    }],
 
     starttime: {
         type: Date,

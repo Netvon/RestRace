@@ -12,9 +12,10 @@ function getRaces(req, res, next){
         query._id = req.params.raceId;
     }
 
-    var properties = "_id name description starttime";
+    var properties = "_id name description starttime teams";
 
 	Race.find(query, properties)
+        .populate('teams')
 		.then(data => {
             if(req.params.id){
                 data = data[0];
