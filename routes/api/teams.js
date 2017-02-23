@@ -4,10 +4,9 @@ const express = require('express'),
     router	= module.exports = express.Router(),
     mongoose = require('mongoose'),
     Team = mongoose.model('Team'),
+    User = mongoose.model('User'),
     Race = mongoose.model('Race');
 
-
-var defaultTeamNames = ['Bavaria', 'Jupiler', 'Hertog jan', 'Brand', 'Amstel', 'Heineken']
 
 function getTeams(req, res, next){
     var query = {};
@@ -26,40 +25,6 @@ function getTeams(req, res, next){
         })
 }
 
-function addTeam(req, res, next){
-
-    if(!req.body.raceId){
-        next();
-    }
-
-    Race.findById(req.body.raceId, function(err, response){
-        if(err){
-            res.json({message: "Error in finding race with id " + req.body.raceId});
-        } else{
-
-            let team = new Team({
-                name: defaultTeamNames[response.teams.length],
-            })
-
-            team.save().then(({_id, name }) => {
-
-                console.log(req.body.raceId)
-                console.log(team._id)
-                Race.findByIdAndUpdate(req.body.raceId, {"$push": {"teams": team._id}}).exec()
-
-                res.setHeader('Location', req.originalUrl + '/' + _id)
-                res.status(201).json({_id, name })
-            }).catch(reason => {
-                let error = new Error(reason)
-                error.status = 500
-                throw error
-            })
-
-        }
-    });
-
-}
-
 
 function deleteTeam(req, res, next){
 
@@ -73,13 +38,35 @@ function deleteTeam(req, res, next){
 
 }
 
+function addUser(req, res, next){
+
+    User.findById(req.body.userId, function (err, response){
+        if(err){
+            res.json({message: "Error in finding user with id " + req.body.userId});
+        }
+        else{
+            Team.findByIdAndUpdate(req.params.teamId, {"$push": {"users": response._id}}, {new: true})
+                .then(({_id, name, users, ranking, endtime }) => {
+                res.setHeader('Location', req.originalUrl + '/' + _id)
+                res.status(201).json({_id, name, users, ranking, endtime})
+            })
+                .catch(reason => {
+                    let error = new Error(reason)
+                    error.status = 500
+                    throw error
+                })
+        }
+    });
+
+}
+
 
 // GET /api/teams
 // GET /api/teams/:teamId
 router.get('/:teamId?', getTeams)
 
-// POST /api/teams
-router.post('/', addTeam)
+// POST /api/teams/:teamId/adduser
+router.post('/:teamId/adduser', addUser)
 
 // DELETE /api/teams/:teamId
 router.delete('/:teamId', deleteTeam)

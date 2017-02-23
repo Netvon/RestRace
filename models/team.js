@@ -5,24 +5,23 @@ const	mongoose	= require('mongoose'),
 
 var teamSchema = new mongoose.Schema({
 
-
     name:{
-        type: String
+        type: String,
+        required: true
     },
 
     users: [{
         type: Schema.ObjectId, ref:"User"
     }],
 
-    ranking: {
+    ranking: [{
         pub:{type: Schema.ObjectId, ref: "Pub"},
         pubPassed:Boolean,
         timePassed: Date
-    },
+    }],
 
     endtime: {
         type: Date,
-        // required: true,
     },
 
     tags: [String],

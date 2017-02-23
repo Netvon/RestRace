@@ -3,7 +3,30 @@
 const express = require('express'),
 	router	= module.exports = express.Router(),
 	mongoose = require('mongoose'),
+    Team = mongoose.model('Team'),
 	Race = mongoose.model('Race');
+
+
+var defaultTeamNames = [
+    'Bavaria',
+    'Jupiler',
+    'Hertog jan',
+    'Brand',
+    'Amstel',
+    'Heineken',
+    'Grolsch',
+    'Dommelsch',
+    'Schultenbräu',
+    'La Trappe',
+    'Wieckse',
+    'Erdinger',
+    'Paulaner',
+    'Duvel',
+    'Hoegaarden',
+    'La Chouffe',
+    'Liefmans',
+    'Palm',
+]
 
 
 function getRaces(req, res, next){
@@ -15,7 +38,7 @@ function getRaces(req, res, next){
     var properties = "_id name description starttime teams";
 
 	Race.find(query, properties)
-        .populate('teams')
+        .populate('teams', '_id name users ranking')
 		.then(data => {
             if(req.params.id){
                 data = data[0];
@@ -72,12 +95,46 @@ function updateRace(req, res, next){
 }
 
 
+function addTeam(req, res, next){
+
+    Race.findById(req.params.raceId, function(err, response){
+        if(err){
+            res.json({message: "Error in finding race with id " + req.params.raceId});
+        } else{
+            var teamname = req.body.name;
+            if(!teamname){
+                teamname = defaultTeamNames[response.teams.length]
+            }
+
+            let team = new Team({
+                name: teamname,
+            })
+
+            team.save().then(({_id, name }) => {
+                Race.findByIdAndUpdate(req.params.raceId, {"$push": {"teams": team._id}}).exec()
+
+                res.setHeader('Location', req.originalUrl + '/' + _id)
+                res.status(201).json({_id, name })
+            }).catch(reason => {
+                let error = new Error(reason)
+                error.status = 500
+                throw error
+            })
+
+        }
+    });
+
+}
+
 // GET /api/races
 // GET /api/races/:raceId
 router.get('/:raceId?', getRaces)
 
 // POST /api/races
 router.post('/', addRace)
+
+// POST /api/races/:raceId/addteam
+router.post('/:raceId/addteam', addTeam)
 
 // DELETE /api/races/:raceId
 router.delete('/:raceId', deleteRace)
