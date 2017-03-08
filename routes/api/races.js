@@ -65,8 +65,15 @@ function addRace(req, res, next){
     })
 
     race.save().then(({_id, name, description, starttime }) => {
+
+        var teams = []
+        req.body.teams.forEach(function (item, index) {
+            newTeam(_id, item);
+            teams.push({name:item})
+        })
+
         res.setHeader('Location', req.originalUrl + '/' + _id)
-        res.status(201).json({_id, name, description, starttime })
+        res.status(201).json({_id, name, description, starttime, teams})
     }).catch(reason => {
         let error = new Error(reason)
         error.status = 500
@@ -101,6 +108,17 @@ function updateRace(req, res, next){
         throw error
     })
 
+}
+
+
+function newTeam(raceId, teamname){
+    console.log(teamname)
+    var team = new Team({
+        name: teamname
+    })
+    team.save().then(({_id}) => {
+        Race.findByIdAndUpdate(raceId, {"$push": {"teams": _id}}).exec()
+    })
 }
 
 
