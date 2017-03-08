@@ -35,10 +35,19 @@ function getRaces(req, res, next){
         query._id = req.params.raceId;
     }
 
-    var properties = "_id name description starttime teams";
+    var properties = "_id name description status starttime pubs teams";
 
 	Race.find(query, properties)
-        .populate('teams', '_id name users ranking')
+        .populate({
+            path: 'teams',
+            model: 'Team',
+            select: '_id name users ranking',
+            populate: {
+                path: 'users',
+                model: 'User',
+                select: '_id firstname lastname'
+            }
+        })
 		.then(data => {
             if(req.params.id){
                 data = data[0];
