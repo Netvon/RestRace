@@ -17,6 +17,7 @@ function getTeams(req, res, next){
     var properties = "_id name users ranking endtime";
 
     Team.find(query, properties)
+        .populate("users", "firstname lastname races")
         .then(data => {
             if(req.params.id){
                 data = data[0];
