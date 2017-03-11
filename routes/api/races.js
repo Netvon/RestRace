@@ -85,6 +85,23 @@ function addRace(req, res, next){
 
 function deleteRace(req, res, next){
 
+
+    // Voorbeeld voor het verwijderen van alle teams in de race
+
+    // Team.findById(req.params.teamId, function(err, team){
+    //     return team.remove(function(err){
+    //         if(!err) {
+    //             Race.update({}, {$pull: {teams: team._id}}, function (err, numberAffected) {
+    //                 console.log(numberAffected);
+    //             })
+    //         } else {
+    //             console.log(err);
+    //         }
+    //         res.status(201).json({return:"return"})
+    //     });
+    // });
+
+
     Race.findByIdAndRemove(req.params.raceId, function(err, response){
         if(err){
             res.json({message: "Error in deleting race id " + req.params.raceId});

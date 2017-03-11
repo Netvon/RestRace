@@ -68,11 +68,32 @@ function updateUser(req, res){
 
 }
 
+function searchUsers(req, res) {
+
+    var re = new RegExp('.*'+req.params.searchText+'.*', "i");
+
+    User.find().or([{ 'firstname': { $regex: re }}, { 'lastname': { $regex: re }}]).exec(function(err, users) {
+        if(err || !users){
+            res.json({message: "Error in finding users with text: " + req.params.searchText});
+        } else{
+            res.setHeader('Location', req.originalUrl + '/' + req.params.searchText)
+            // res.status(201).json({_id: users[0]._id, firstname: users[0].firstname, lastname: users[0].lastname })
+            res.status(201).json(users);
+        }
+
+    });
+
+}
+
 
 // GET /api/users
 // GET /api/users/:userId
 router.get('/:userId?', (req, res, next) => {
     getUsers(req,res)
+})
+
+router.get('/search/:searchText', (req, res, next) => {
+    searchUsers(req,res)
 })
 
 // POST /api/users
