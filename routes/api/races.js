@@ -42,6 +42,7 @@ function getRaces(req, res, next){
             path: 'teams',
             model: 'Team',
             select: '_id name users ranking',
+            options: { sort: { name: 1 } },
             populate: {
                 path: 'users',
                 model: 'User',
@@ -67,13 +68,18 @@ function addRace(req, res, next){
     race.save().then(({_id, name, description, starttime }) => {
 
         var teams = []
+        var returnCallback = function (team) {
+            teams.push(team);
+            if(teams.length == req.body.teams.length){
+                res.setHeader('Location', req.originalUrl + '/' + _id)
+                res.status(201).json({_id, name, description, starttime, teams})
+            }
+        }
+
         req.body.teams.forEach(function (item, index) {
-            newTeam(_id, item);
-            teams.push({name:item})
+            newTeam(_id, item, returnCallback);
         })
 
-        res.setHeader('Location', req.originalUrl + '/' + _id)
-        res.status(201).json({_id, name, description, starttime, teams})
     }).catch(reason => {
         let error = new Error(reason)
         error.status = 500
@@ -128,13 +134,15 @@ function updateRace(req, res, next){
 }
 
 
-function newTeam(raceId, teamname){
+function newTeam(raceId, teamname, callback){
     console.log(teamname)
     var team = new Team({
         name: teamname
     })
     team.save().then(({_id}) => {
-        Race.findByIdAndUpdate(raceId, {"$push": {"teams": _id}}).exec()
+        Race.findByIdAndUpdate(raceId, {"$push": {"teams": _id}}, function(err, response){
+            callback({_id:_id, name:teamname});
+        })
     })
 }
 
