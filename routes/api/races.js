@@ -5,28 +5,6 @@ const express = require('express'),
 	Race = mongoose.model('Race'),
     { NotFoundError, ValidationError } = require('../../models/errors')
 
-
-let defaultTeamNames = [
-    'Bavaria',
-    'Jupiler',
-    'Hertog jan',
-    'Brand',
-    'Amstel',
-    'Heineken',
-    'Grolsch',
-    'Dommelsch',
-    'Schultenbräu',
-    'La Trappe',
-    'Wieckse',
-    'Erdinger',
-    'Paulaner',
-    'Duvel',
-    'Hoegaarden',
-    'La Chouffe',
-    'Liefmans',
-    'Palm',
-]
-
 router.param('raceId', (req, res, next, raceId) => {
     req.requestedRaceId = raceId
 
@@ -67,14 +45,24 @@ function addRace(req, res, next){
         starttime: new Date(req.body.starttime)
     })
 
-    req.body.tags.forEach(tag => race.tags.addToSet(tag))    
+    req.body.tags.forEach(tag => race.tags.addToSet(tag))
 
     race.save()
         .then(({_id, name, description, starttime }) => {
             req.socketIo.emit('race-added', {_id, name, description, starttime })
 
-            res.setHeader('Location', `${req.originalUrl}/${_id}`)
-            res.status(201).json({_id, name, description, starttime })            
+            let teamPromises = []
+
+            req.body.teams.forEach(teamName => {
+                teamPromises.push(race.addNewTeam(teamName).catch(err => next(err)))
+            })
+
+            Promise.all(teamPromises)
+                .then(ok => {
+                    res.setHeader('Location', `${req.originalUrl}/${_id}`)
+                    res.status(201).json({_id, name, description, starttime })  
+                })
+                .catch(err => next(err))                      
         })
         .catch(reason => {
             if('ValidationError' === reason.name) {
@@ -92,6 +80,21 @@ function addRace(req, res, next){
  * @param {any} next 
  */
 function deleteRace(req, res, next) {
+
+    // Voorbeeld voor het verwijderen van alle teams in de race
+
+    // Team.findById(req.params.teamId, function(err, team){
+    //     return team.remove(function(err){
+    //         if(!err) {
+    //             Race.update({}, {$pull: {teams: team._id}}, function (err, numberAffected) {
+    //                 console.log(numberAffected);
+    //             })
+    //         } else {
+    //             console.log(err);
+    //         }
+    //         res.status(201).json({return:"return"})
+    //     });
+    // });
 
     res.race.remove()
         .then(race => {
@@ -117,6 +120,19 @@ function updateRace(req, res, next){
             next(reason)
     })
 
+}
+
+
+function newTeam(raceId, teamname, callback){
+    console.log(teamname)
+    var team = new Team({
+        name: teamname
+    })
+    team.save().then(({_id}) => {
+        Race.findByIdAndUpdate(raceId, {"$push": {"teams": _id}}, function(err, response){
+            callback({_id:_id, name:teamname});
+        })
+    })
 }
 
 
