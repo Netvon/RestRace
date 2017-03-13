@@ -1,13 +1,12 @@
-
-
 const express = require('express'),
 	router	= module.exports = express.Router(),
 	mongoose = require('mongoose'),
     Team = mongoose.model('Team'),
-	Race = mongoose.model('Race');
+	Race = mongoose.model('Race'),
+    { NotFoundError, ValidationError } = require('../../models/errors')
 
 
-var defaultTeamNames = [
+let defaultTeamNames = [
     'Bavaria',
     'Jupiler',
     'Hertog jan',
@@ -28,33 +27,37 @@ var defaultTeamNames = [
     'Palm',
 ]
 
+router.param('raceId', (req, res, next, raceId) => {
+    req.requestedRaceId = raceId
 
-function getRaces(req, res, next){
-    var query = {};
-    if(req.params.raceId){
-        query._id = req.params.raceId;
+    req.socketIo.emit('race-resolved', `Resolved Race with id '${raceId}'`)
+
+    Race.findSingleById(raceId)
+        .then(race => {
+            res.race = race
+            next()
+        })
+        .catch(reason => {
+
+            if('CastError' === err.name && 'ObjectId' === err.kind)
+                next(new NotFoundError(`Race with id ${raceId} not found`))
+            else
+                next(reason)
+        })
+})
+
+
+function getRaces(req, res, next) {
+
+    if(res.race) {
+        res.json(res.race)
+    } else {
+        Race.findAll()
+            .then(data => res.json(data))
+            .catch(err => next(err))
     }
-
-    var properties = "_id name description status starttime pubs teams";
-
-	Race.find(query, properties)
-        .populate({
-            path: 'teams',
-            model: 'Team',
-            select: '_id name users ranking',
-            populate: {
-                path: 'users',
-                model: 'User',
-                select: '_id firstname lastname'
-            }
-        })
-		.then(data => {
-            if(req.params.id){
-                data = data[0];
-            }
-            return res.json(data);
-        })
 }
+
 
 function addRace(req, res, next){
 
@@ -64,41 +67,54 @@ function addRace(req, res, next){
         starttime: new Date(req.body.starttime)
     })
 
-    race.save().then(({_id, name, description, starttime }) => {
-        res.setHeader('Location', req.originalUrl + '/' + _id)
-        res.status(201).json({_id, name, description, starttime })
-    }).catch(reason => {
-        let error = new Error(reason)
-        error.status = 500
-        throw error
-    })
+    req.body.tags.forEach(tag => race.tags.addToSet(tag))    
+
+    race.save()
+        .then(({_id, name, description, starttime }) => {
+            req.socketIo.emit('race-added', {_id, name, description, starttime })
+
+            res.setHeader('Location', `${req.originalUrl}/${_id}`)
+            res.status(201).json({_id, name, description, starttime })            
+        })
+        .catch(reason => {
+            if('ValidationError' === reason.name) {
+                next(new ValidationError(reason.errors, reason.message))
+            } else {
+                next(reason)
+            }
+        })
 
 }
 
+/**
+ * @param {Request} req 
+ * @param {Response} res 
+ * @param {any} next 
+ */
+function deleteRace(req, res, next) {
 
-function deleteRace(req, res, next){
-
-    Race.findByIdAndRemove(req.params.raceId, function(err, response){
-        if(err){
-            res.json({message: "Error in deleting race id " + req.params.raceId});
-        } else{
-            res.json({message: "Race with id " + req.params.raceId + " removed."});
-        }
-    });
-
+    res.race.remove()
+        .then(race => {
+            res.status(200).json({ message: `Race with id ${req.requestedRaceId} removed`})
+        })
+        .catch(reason => next(reason))
 }
 
 function updateRace(req, res, next){
 
-    Race.findByIdAndUpdate(req.params.raceId, req.body)
-        .then(({_id, name, description, starttime }) => {
-        res.setHeader('Location', req.originalUrl + '/' + _id)
-        res.status(201).json({_id, name, description, starttime })
+    Race.update({_id: req.params.race_Id }, { 
+        name: req.body.name,
+        starttime: req.body.starttime,
+        status: req.body.starttime
+    }, { $addToSet: req.body.tags })
+    .then(updated => {
+        res.status(201).json({message: `Race with id ${req.requestedRaceId} updated`})
     })
-        .catch(reason => {
-        let error = new Error(reason)
-        error.status = 500
-        throw error
+    .catch(reason => {
+        if('ValidationError' === reason.name)
+            next(new ValidationError(reason.errors, reason.message))
+        else
+            next(reason)
     })
 
 }
@@ -106,32 +122,9 @@ function updateRace(req, res, next){
 
 function addTeam(req, res, next){
 
-    Race.findById(req.params.raceId, function(err, response){
-        if(err){
-            res.json({message: "Error in finding race with id " + req.params.raceId});
-        } else{
-            var teamname = req.body.name;
-            if(!teamname){
-                teamname = defaultTeamNames[response.teams.length]
-            }
-
-            let team = new Team({
-                name: teamname,
-            })
-
-            team.save().then(({_id, name }) => {
-                Race.findByIdAndUpdate(req.params.raceId, {"$push": {"teams": team._id}}).exec()
-
-                res.setHeader('Location', req.originalUrl + '/' + _id)
-                res.status(201).json({_id, name })
-            }).catch(reason => {
-                let error = new Error(reason)
-                error.status = 500
-                throw error
-            })
-
-        }
-    });
+    res.race.addNewTeam(req.body.name)
+        .then(x => res.status(201).json(x))
+        .catch(reason => next(reason))
 
 }
 
@@ -149,4 +142,4 @@ router.post('/:raceId/addteam', addTeam)
 router.delete('/:raceId', deleteRace)
 
 // PATCH /api/races/:raceId
-router.patch('/:raceId', updateRace)
+router.patch('/:race_Id', updateRace)

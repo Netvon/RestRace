@@ -32,6 +32,33 @@ var teamSchema = new mongoose.Schema({
     }
 })
 
+let defaultTeamNames = [
+    'Bavaria',
+    'Jupiler',
+    'Hertog jan',
+    'Brand',
+    'Amstel',
+    'Heineken',
+    'Grolsch',
+    'Dommelsch',
+    'Schultenbräu',
+    'La Trappe',
+    'Wieckse',
+    'Erdinger',
+    'Paulaner',
+    'Duvel',
+    'Hoegaarden',
+    'La Chouffe',
+    'Liefmans',
+    'Palm',
+]
+
+teamSchema.statics.createWithNameOrDefaultName = function(teamName = null) {
+    return this.create({
+        name:  teamName || defaultTeamNames[~~Math.random() * defaultTeamNames.length]
+    })
+}
+
 // raceSchema.plugin(slug, { sourceField: 'name' })
 
-mongoose.model('Team', teamSchema)
+module.exports = mongoose.model('Team', teamSchema)
