@@ -40,6 +40,7 @@ const defaultPopulate = {
 	path: 'teams',
 	model: 'Team',
 	select: '_id name users ranking',
+	options: { sort: { name: 1 } },
 	populate: {
 		path: 'users',
 		model: 'User',

@@ -48,21 +48,33 @@ function addRace(req, res, next){
     req.body.tags.forEach(tag => race.tags.addToSet(tag))
 
     race.save()
-        .then(({_id, name, description, starttime }) => {
+        .then(({_id, name, description, starttime, teams }) => {
             req.socketIo.emit('race-added', {_id, name, description, starttime })
 
-            let teamPromises = []
+            let addedTeams = []
 
-            req.body.teams.forEach(teamName => {
-                teamPromises.push(race.addNewTeam(teamName).catch(err => next(err)))
-            })
+            if(req.body.teams) {
+                let teamPromises = []
 
-            Promise.all(teamPromises)
-                .then(ok => {
-                    res.setHeader('Location', `${req.originalUrl}/${_id}`)
-                    res.status(201).json({_id, name, description, starttime })  
+                req.body.teams.forEach(teamName => {
+                    teamPromises.push(race.addNewTeam(teamName))
                 })
-                .catch(err => next(err))                      
+
+                Promise.all(teamPromises)
+                    .then(ok => {
+
+                        ok.forEach(t => {
+                            addedTeams.push({_id: t._id, name: t.name})
+                        })
+
+                        res.setHeader('Location', `${req.originalUrl}/${_id}`)
+                        res.status(201).json({_id, name, description, starttime, teams: addedTeams })  
+                    })
+                    .catch(err => {
+                        next(err)
+                    })     
+            }
+                             
         })
         .catch(reason => {
             if('ValidationError' === reason.name) {

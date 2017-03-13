@@ -5,7 +5,7 @@ module.exports = function(io) {
 			pug 		= require('pug'),
 			path 		= require('path'),
 			bodyParser 	= require('body-parser'),
-			{connectDb}	= require('./data')
+			connectDb	= require('./data')
 
 
 	// connect data layer
