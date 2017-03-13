@@ -5,7 +5,9 @@ module.exports = function(io) {
 			pug 		= require('pug'),
 			path 		= require('path'),
 			bodyParser 	= require('body-parser'),
-			connectDb	= require('./data')
+			connectDb	= require('./data'),
+			swaggerUi	= require('swagger-ui-express'),
+			swaggerDoc	= require('./docs/swagger.json')
 
 
 	// connect data layer
@@ -29,6 +31,8 @@ module.exports = function(io) {
 	// setup routes middleware
 	app.use('/', require('./routes/index')(express, io))
 	app.use('/api', require('./routes/api')(express, io))
+
+	app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
 
 	// setup final middleware
 	app.use((req, res, next) => {

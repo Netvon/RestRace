@@ -40,8 +40,49 @@ paths:
               $ref: '#/definitions/NotFoundError'
         default:
           description: Unexpected error
+          
+  /races:
+     post:
+      summary: Create a new Race
+      description: |
+        Returns a race
+      parameters:
+        - name: race
+          in: body
+          description: The Race to create
+          required: true
+          schema:
+            $ref: '#/definitions/RacePost'
+      tags:
+        - Races
+      responses:
+        201:
+          description: Created
+          schema:
+              $ref: '#/definitions/Race'
+        default:
+          description: Unexpected error
 
 definitions:
+  RacePost:
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      starttime:
+        type: string
+        format: date
+      tags:
+        type: array
+        items:
+          type: string
+      teams:
+        type: array
+        items:
+          type: string
+      
   Race:
     type: object
     properties:

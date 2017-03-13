@@ -1,0 +1,207 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "RestRace Api",
+        "description": "description",
+        "version": "1.0.0"
+    },
+    "host": "localhost:3000",
+    "schemes": [
+        "http"
+    ],
+    "basePath": "/api",
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/races/{id}": {
+            "get": {
+                "summary": "All Races",
+                "description": "Returns a race\n",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The ID of the Race to get",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "Races"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The Race",
+                        "schema": {
+                            "$ref": "#/definitions/Race"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/NotFoundError"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/races": {
+            "post": {
+                "summary": "Create a new Race",
+                "description": "Returns a race\n",
+                "parameters": [
+                    {
+                        "name": "race",
+                        "in": "body",
+                        "description": "The Race to create",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/RacePost"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Races"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/Race"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "RacePost": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "starttime": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "teams": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "Race": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "starttime": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "notstarted",
+                        "started",
+                        "ended"
+                    ],
+                    "default": "notstarted"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "teams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Team"
+                    }
+                },
+                "pubs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Pub"
+                    }
+                }
+            }
+        },
+        "Team": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "Pub": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "NotFoundError": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Error"
+                },
+                {
+                    "properties": {
+                        "error": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "object",
+                    "properties": {
+                        "message": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
