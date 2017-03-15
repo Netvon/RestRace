@@ -45,7 +45,9 @@ function addRace(req, res, next) {
         starttime: new Date(req.body.starttime)
     })
 
-    req.body.tags.forEach(tag => race.tags.addToSet(tag))
+    if(req.body.tags){
+        req.body.tags.forEach(tag => race.tags.addToSet(tag))
+    }
 
     race.save()
         .then(({_id, name, description, starttime, teams }) => {
@@ -74,7 +76,11 @@ function addRace(req, res, next) {
                         next(err)
                     })     
             }
-                             
+            else{
+                res.setHeader('Location', `${req.originalUrl}/${_id}`)
+                res.status(201).json({_id, name, description, starttime, teams })
+            }
+
         })
         .catch(reason => {
             if('ValidationError' === reason.name) {
