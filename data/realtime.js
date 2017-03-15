@@ -38,6 +38,6 @@ class Realtime {
 	 * @memberOf Realtime
 	 */
 	send(eventName, eventData) {
-		this.__io.emit('msg', message)
+		this.__io.emit('msg', eventData)
 	}
 }

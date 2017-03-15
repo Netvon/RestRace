@@ -50,6 +50,26 @@ let defaultTeamNames = [
     'Palm',
 ]
 
+let defaultProjection = '_id name users ranking endtime'
+
+teamSchema.statics.findAll = function() {
+    return this.find({}, defaultProjection)
+               .populate("users", "firstname lastname races")
+}
+
+teamSchema.statics.findSingleById = function(_id) {
+    return this.findOne(_id, defaultProjection)
+               .populate("users", "firstname lastname races")
+}
+
+teamSchema.methods.removeUser = function() {
+
+}
+
+teamSchema.methods.addUser = function() {
+
+}
+
 teamSchema.statics.createWithNameOrDefaultName = function(teamName = null) {
     return this.create({
         name:  teamName || defaultTeamNames[~~Math.random() * defaultTeamNames.length]
