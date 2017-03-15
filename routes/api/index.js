@@ -1,11 +1,10 @@
-module.exports = function(express, io) {
-	let router = express.Router(),
-		socketIo = io.of('/api/v1')
+module.exports = function(app, express) {
+	let router = express.Router()
 
 
 	router.use('*', (req, res, next) => {
 		req.isApiCall = true
-		req.socketIo = socketIo
+		req.realtime = app.get('realtime')
 
 		next()
 	})

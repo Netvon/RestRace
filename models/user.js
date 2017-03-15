@@ -1,4 +1,3 @@
-
 const	mongoose	= require('mongoose'),
         slug		= require('mongoose-document-slugs'),
         Schema		= mongoose.Schema;
@@ -17,9 +16,6 @@ var userSchema = new mongoose.Schema({
     races:[{
         type: Schema.ObjectId, ref:"Race"
     }],
-
-
-    tags: [String],
 
     meta: {
         createdOn: { type: Date, default: Date.now },

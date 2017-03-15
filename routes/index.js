@@ -1,4 +1,4 @@
-module.exports = function(express, io) {
+module.exports = function(app, express) {
 	let router = express.Router()
 
 	router.get('/', (req, res, next) => {

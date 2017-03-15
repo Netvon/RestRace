@@ -8,7 +8,7 @@ const express = require('express'),
 router.param('raceId', (req, res, next, raceId) => {
     req.requestedRaceId = raceId
 
-    req.socketIo.emit('race-resolved', `Resolved Race with id '${raceId}'`)
+    req.realtime.send('race-resolved', `Resolved Race with id '${raceId}'`)
 
     Race.findSingleById(raceId)
         .then(race => {
@@ -37,7 +37,7 @@ function getRaces(req, res, next) {
 }
 
 
-function addRace(req, res, next){
+function addRace(req, res, next) {
 
     let race = new Race({
         name: req.body.name,
@@ -49,7 +49,7 @@ function addRace(req, res, next){
 
     race.save()
         .then(({_id, name, description, starttime, teams }) => {
-            req.socketIo.emit('race-added', {_id, name, description, starttime })
+            req.realtime.send('race-added', {_id, name, description, starttime })
 
             let addedTeams = []
 
@@ -169,5 +169,5 @@ router.post('/:raceId/addteam', addTeam)
 // DELETE /api/races/:raceId
 router.delete('/:raceId', deleteRace)
 
-// PATCH /api/races/:raceId
+// PATCH /api/races/:race_Id
 router.patch('/:race_Id', updateRace)
