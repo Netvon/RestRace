@@ -15,7 +15,6 @@ var teamSchema = new mongoose.Schema({
 
     ranking: [{
         pub:{type: Schema.ObjectId, ref: "Pub"},
-        pubPassed:Boolean,
         timePassed: Date
     }],
 
