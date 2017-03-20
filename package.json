@@ -13,6 +13,7 @@
     "pug": "^2.0.0-beta11",
     "socket.io": "^1.7.3",
     "passport": "^0.3.2",
-    "swagger-ui-express": "~1.0.5"
+    "swagger-ui-express": "~1.0.5",
+    "google-places": "^0.0.2"
   }
 }
