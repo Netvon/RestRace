@@ -23,7 +23,8 @@
     "swagger-ui-express": "~1.0.5",
     "vue": "^2.2.4",
     "vue-bulma-card": "^1.0.2",
-    "vue-socket.io": "^2.1.0"
+    "vue-socket.io": "^2.1.0",
+    "google-places": "^0.0.2"
   },
   "devDependencies": {
     "webpack": "~2.2.1",
