@@ -2,5 +2,7 @@ doctype html
 html
   head
     title= 'rest-race'
+    link(href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.css' rel='stylesheet')
   body
-    div= 'great things will be here'
+    div(id='app')= 'Loading application'
+    script(src='bundle.js')

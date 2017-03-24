@@ -45,6 +45,8 @@ app.use((req, res, next) => {
 
 // setup global error handler
 app.use((err, req, res, next) => {
+	app.get('realtime').send('error', err)
+
 	let status = err.status || 500
 
 	res.status(status)
@@ -53,6 +55,8 @@ app.use((err, req, res, next) => {
 	} else {
 		res.render('error', { message: err.message, status })
 	}
+
+	return
 })
 
 module.exports = app

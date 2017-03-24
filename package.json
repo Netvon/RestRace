@@ -3,18 +3,40 @@
   "version": "0.0.1",
   "description": "An application for creating and managing Bar Tours",
   "main": "app.js",
-  "author": "Tom van Nimwegen",
+  "scripts": {
+    "start": "node bin/server.js",
+    "spa-watch": "webpack --watch"
+  },
   "dependencies": {
+    "axios": "^0.15.3",
     "body-parser": "^1.16.1",
     "cors": "^2.8.1",
+    "bulma": "^0.4.0",
     "express": "^4.14.0",
     "google-places": "^0.0.2",
     "lodash": "^4.17.4",
     "mongoose": "^4.8.2",
     "mongoose-document-slugs": "^1.1.0",
     "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "express-session": "^1.15.1",
     "pug": "^2.0.0-beta11",
     "socket.io": "^1.7.3",
-    "swagger-ui-express": "~1.0.5"
+    "swagger-ui-express": "~1.0.5",
+    "vue": "^2.2.4",
+    "vue-bulma-card": "^1.0.2",
+    "vue-socket.io": "^2.1.0",
+    "google-places": "^0.0.2"
+  },
+  "devDependencies": {
+    "webpack": "~2.2.1",
+    "vue-loader": "^11.1.4",
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.0",
+    "babel-preset-latest": "^6.0.0",
+    "node-sass": "^4.5.0",
+    "sass-loader": "^5.0.1",
+    "css-loader": "^0.27.3",
+    "vue-template-loader": "^0.2.4"
   }
 }
