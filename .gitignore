@@ -109,3 +109,5 @@ typings/
 
 *.lnk
 desktop.ini
+
+public/bundle.js

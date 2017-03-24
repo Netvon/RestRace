@@ -12,8 +12,12 @@ router.param('raceId', (req, res, next, raceId) => {
 
     Race.findSingleById(raceId)
         .then(race => {
-            res.race = race
-            next()
+            if(race === null)
+                next(new NotFoundError(`Race with id ${raceId} not found`))
+            else {
+                res.race = race
+                next()
+            }            
         })
         .catch(reason => {
 

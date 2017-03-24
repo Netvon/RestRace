@@ -1,6 +1,5 @@
 module.exports = function(app, server) {
-	let io = require('socket.io')()
-	io.attach(server)
+	let io = require('socket.io')(server)
 
 	let realtime = new Realtime(io)
 
@@ -38,6 +37,6 @@ class Realtime {
 	 * @memberOf Realtime
 	 */
 	send(eventName, eventData) {
-		this.__io.emit('msg', eventData)
+		this.__io.emit(eventName, eventData)
 	}
 }
