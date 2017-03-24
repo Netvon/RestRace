@@ -6,7 +6,8 @@ const 	express 	= require('express'),
 		bodyParser 	= require('body-parser'),
 		connectDb	= require('./data'),
 		swaggerUi	= require('swagger-ui-express'),
-		swaggerDoc	= require('./docs/swagger.json')
+		swaggerDoc	= require('./docs/swagger.json'),
+		cors		= require('cors')
 
 
 // connect data layer
@@ -26,6 +27,7 @@ app.set('view engine', 'pug')
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(cors())
 
 // setup routes middleware
 app.use('/', require('./routes/index')(app, express))

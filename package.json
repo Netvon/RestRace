@@ -6,14 +6,15 @@
   "author": "Tom van Nimwegen",
   "dependencies": {
     "body-parser": "^1.16.1",
+    "cors": "^2.8.1",
     "express": "^4.14.0",
+    "google-places": "^0.0.2",
     "lodash": "^4.17.4",
     "mongoose": "^4.8.2",
     "mongoose-document-slugs": "^1.1.0",
+    "passport": "^0.3.2",
     "pug": "^2.0.0-beta11",
     "socket.io": "^1.7.3",
-    "passport": "^0.3.2",
-    "swagger-ui-express": "~1.0.5",
-    "google-places": "^0.0.2"
+    "swagger-ui-express": "~1.0.5"
   }
 }
