@@ -7,7 +7,8 @@ const 	express 	= require('express'),
 		connectDb	= require('./data'),
 		useApiDocs	= require('./middlewares/api-docs'),
 		useErrors	= require('./middlewares/errorHandling'),
-		useAuth		= require('./middlewares/auth')
+		useAuth		= require('./middlewares/auth'),
+		cors		= require('cors')
 
 
 // connect data layer
@@ -21,6 +22,7 @@ app.set('view engine', 'pug')
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(cors())
 
 // setup routes middleware
 app.use('/', require('./routes/index')(app, express))

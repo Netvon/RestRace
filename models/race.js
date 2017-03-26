@@ -2,6 +2,10 @@ const	mongoose	= require('mongoose'),
 		slug		= require('mongoose-document-slugs'),
 		Schema		= mongoose.Schema
 
+var GooglePlaces = require('google-places');
+// api key
+var places = new GooglePlaces('AIzaSyBNXXpKe8sc-_LIXSP6vdpdxDA3Tiz-p-E');
+
 var raceSchema = new mongoose.Schema({
 	name: { type: String, required: true},
 	description: String,
@@ -37,7 +41,7 @@ var raceSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 const defaultProjection = '_id name description status starttime pubs teams'
-const defaultPopulate = {
+const defaultPopulate = [{
 	path: 'teams',
 	model: 'Team',
 	select: '_id name users ranking',
@@ -47,7 +51,11 @@ const defaultPopulate = {
 		model: 'User',
 		select: '_id firstname lastname'
 	}
-}
+}, {
+    path: 'pubs',
+    model: 'Pub',
+    select: '_id name',
+}]
 
 raceSchema.statics.findAll = function(projection = defaultProjection, populateOptions = defaultPopulate) {
 	return this.find({}, projection).populate(populateOptions)
@@ -71,6 +79,35 @@ raceSchema.methods.addNewTeam = function(teamName) {
 		})
 		.catch(err => reject(err))
 	})
+}
+
+raceSchema.methods.addNewPub = function(placeId) {
+    return new Promise((resolve, reject) => {
+    	var pub = require('./pub');
+        pub.findSingleById(placeId)
+            .then(newPub => {
+            	var self = this;
+            	if(newPub){
+                    this.update({ $push: { "pubs": newPub._id } })
+                        .then(ok => resolve(newPub))
+                        .catch(err => reject(err))
+				}
+				else{
+                    places.details({placeid: placeId}, function(err, response) {
+                        pub.createPub(response.result)
+							.then(newPub => {
+                                self.update({ $push: { "pubs": newPub._id } })
+                                    .then(ok => resolve(newPub))
+                                    .catch(err => reject(err))
+                        })
+
+                    });
+				}
+
+
+            })
+            .catch(err => reject(err))
+    })
 }
 
 raceSchema.plugin(slug, { sourceField: 'name' })

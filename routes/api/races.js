@@ -3,7 +3,10 @@ const   express     = require('express'),
         mongoose    = require('mongoose'),
         Team        = require('../../models/team'),
         Race        = require('../../models/race'),
-        { NotFoundError, ValidationError } = require('../../models/errors')
+        Pub         = require('../../models/pub'),
+        { NotFoundError, ValidationError } = require('../../models/errors'),
+        GooglePlaces = require('google-places'),
+        places = new GooglePlaces('AIzaSyDTnFknpxRhzZHkCegKD0IhjfYWxb-WU14')
 
 router.param('raceId', (req, res, next, raceId) => {
     req.requestedRaceId = raceId
@@ -53,6 +56,7 @@ function getRaces(req, res, next) {
 
 function addRace(req, res, next) {
 
+
     let race = new Race({
         name: req.body.name,
         description: req.body.description,
@@ -64,27 +68,39 @@ function addRace(req, res, next) {
     }
 
     race.save()
-        .then(({_id, name, description, starttime, teams }) => {
+        .then(({_id, name, description, starttime, teams, pubs }) => {
             req.realtime.send('race-added', {_id, name, description, starttime })
 
             let addedTeams = []
+            let addedPubs = []
 
-            if(req.body.teams) {
-                let teamPromises = []
+            if(req.body.teams || req.body.pubs) {
+                let allPromises = []
 
                 req.body.teams.forEach(teamName => {
-                    teamPromises.push(race.addNewTeam(teamName))
+                    allPromises.push(race.addNewTeam(teamName))
+                })
+                req.body.pubs.forEach(pub => {
+                    allPromises.push(race.addNewPub(pub.place_id))
                 })
 
-                Promise.all(teamPromises)
+                Promise.all(allPromises)
                     .then(ok => {
 
+                        console.log('allFinished');
+
                         ok.forEach(t => {
-                            addedTeams.push({_id: t._id, name: t.name})
+                            if(t.placeId){
+                                addedPubs.push({_id: t._id, name: t.name})
+                            }
+                            else{
+                                addedTeams.push({_id: t._id, name: t.name})
+                            }
+
                         })
 
                         res.setHeader('Location', `${req.originalUrl}/${_id}`)
-                        res.status(201).json({_id, name, description, starttime, teams: addedTeams })  
+                        res.status(201).json({_id, name, description, starttime, teams: addedTeams, pubs: addedPubs })
                     })
                     .catch(err => {
                         next(err)
@@ -176,6 +192,21 @@ function addTeam(req, res, next){
 
 }
 
+
+function addPub(req, res, next) {
+
+    places.details({placeid: req.body.placeId}, function(err, response) {
+        res.status(201).json(response);
+    });
+
+
+}
+
+
+
+
+
+
 // GET /api/races
 // GET /api/races/:raceId
 router.get('/:raceId?', getRaces)
@@ -185,6 +216,9 @@ router.post('/', addRace)
 
 // POST /api/races/:raceId/addteam
 router.post('/:raceId/addteam', addTeam)
+
+// POST /api/races/:raceId/addpub
+router.post('/:raceId/addteam', addPub)
 
 // DELETE /api/races/:raceId
 router.delete('/:raceId', deleteRace)
