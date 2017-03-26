@@ -4,27 +4,30 @@
   "description": "An application for creating and managing Bar Tours",
   "main": "app.js",
   "scripts": {
-    "start": "node bin/server.js",
-    "spa-watch": "webpack --watch"
+    "start": "node bin/server.js"
   },
   "dependencies": {
     "axios": "^0.15.3",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.16.1",
     "bulma": "^0.4.0",
     "express": "^4.14.0",
+    "express-session": "^1.15.1",
+    "google-places": "^0.0.2",
+    "jsonwebtoken": "^7.3.0",
     "lodash": "^4.17.4",
     "mongoose": "^4.8.2",
     "mongoose-document-slugs": "^1.1.0",
+    "mongoose-hidden": "^1.2.0",
     "passport": "^0.3.2",
+    "passport-jwt": "^2.2.1",
     "passport-local": "^1.0.0",
-    "express-session": "^1.15.1",
     "pug": "^2.0.0-beta11",
     "socket.io": "^1.7.3",
     "swagger-ui-express": "~1.0.5",
     "vue": "^2.2.4",
     "vue-bulma-card": "^1.0.2",
-    "vue-socket.io": "^2.1.0",
-    "google-places": "^0.0.2"
+    "vue-socket.io": "^2.1.0"
   },
   "devDependencies": {
     "webpack": "~2.2.1",

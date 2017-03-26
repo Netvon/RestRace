@@ -18,7 +18,7 @@ produces:
 paths:
   /races/{id}:
      get:
-      summary: All Races
+      summary: A specific Race
       description: |
         Returns a race
       parameters:
@@ -42,7 +42,21 @@ paths:
           description: Unexpected error
           
   /races:
-     post:
+    get:
+      summary: All Races
+      description: |
+        Returns a race
+      tags:
+        - Races
+      responses:
+        200:
+          description: OK
+          schema:
+              $ref: '#/definitions/Races'
+        default:
+          description: Unexpected error
+          
+    post:
       summary: Create a new Race
       description: |
         Returns a race
@@ -112,6 +126,12 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Pub'
+          
+  Races:
+    type: array
+    items:
+      $ref: '#/definitions/Race'
+  
   Team:
     type: object
     properties:
@@ -141,5 +161,9 @@ definitions:
         properties:
           message:
             type: string
+          name:
+            type: string
+          status:
+            type: integer
           
     

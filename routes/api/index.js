@@ -1,10 +1,27 @@
-module.exports = function(app, express) {
+module.exports = function(app, express = require('express')) {
 	let router = express.Router()
-
+	let lodash = require('lodash')	
 
 	router.use('*', (req, res, next) => {
 		req.isApiCall = true
 		req.realtime = app.get('realtime')
+
+		next()
+	})
+
+	router.use((req, res, next) => {
+
+		req.fields = []	
+			
+		if(req.query.fields)
+			req.fields = req.query.fields.split(',')
+
+		res.projectJson = (obj) => {
+			if(req.fields && req.field.length > 0)
+				res.json(lodash.pick(obj, req.fields))
+			else
+				res.json(obj)
+		}
 
 		next()
 	})

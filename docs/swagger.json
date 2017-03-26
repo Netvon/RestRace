@@ -16,7 +16,7 @@
     "paths": {
         "/races/{id}": {
             "get": {
-                "summary": "All Races",
+                "summary": "A specific Race",
                 "description": "Returns a race\n",
                 "parameters": [
                     {
@@ -50,6 +50,24 @@
             }
         },
         "/races": {
+            "get": {
+                "summary": "All Races",
+                "description": "Returns a race\n",
+                "tags": [
+                    "Races"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Races"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            },
             "post": {
                 "summary": "Create a new Race",
                 "description": "Returns a race\n",
@@ -153,6 +171,12 @@
                         "$ref": "#/definitions/Pub"
                     }
                 }
+            }
+        },
+        "Races": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Race"
             }
         },
         "Team": {

@@ -31,9 +31,10 @@ var raceSchema = new mongoose.Schema({
 	
 	meta: {
 		createdOn: { type: Date, default: Date.now },
+		updatedOn: { type: Date },
 		isEnabled: { type: Boolean, default: true }
 	}	
-})
+}, { timestamps: true })
 
 const defaultProjection = '_id name description status starttime pubs teams'
 const defaultPopulate = {
@@ -64,7 +65,7 @@ raceSchema.methods.addNewTeam = function(teamName) {
 	return new Promise((resolve, reject) => {
 		require('./team').createWithNameOrDefaultName(teamName)
 		.then(newTeam => {
-			this.update({ $push: { "teams": newTeam._id } })
+			this.update({ $push: { 'teams': newTeam._id } })
 				.then(ok => resolve(newTeam))
 				.catch(err => reject(err))
 		})

@@ -5,18 +5,13 @@ const 	express 	= require('express'),
 		path 		= require('path'),
 		bodyParser 	= require('body-parser'),
 		connectDb	= require('./data'),
-		swaggerUi	= require('swagger-ui-express'),
-		swaggerDoc	= require('./docs/swagger.json')
+		useApiDocs	= require('./middlewares/api-docs'),
+		useErrors	= require('./middlewares/errorHandling'),
+		useAuth		= require('./middlewares/auth')
 
 
 // connect data layer
 connectDb('rest-race').catch(err => console.log(err))
-
-// import models
-require('./models/race')
-require('./models/user')
-require('./models/team')
-require('./models/pub')
 
 // setup view engine
 app.set('views', path.join(__dirname, 'views'))
@@ -31,30 +26,8 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', require('./routes/index')(app, express))
 app.use('/api', require('./routes/api')(app, express))
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
-
-// setup final middleware
-app.use((req, res, next) => {
-	let err = new Error('Nothing Found')
-	err.status = 404
-
-	next(err)
-})
-
-// setup global error handler
-app.use((err, req, res, next) => {
-	app.get('realtime').send('error', err)
-
-	let status = err.status || 500
-
-	res.status(status)
-	if(req.isApiCall) {
-		res.json({ error: err })
-	} else {
-		res.render('error', { message: err.message, status })
-	}
-
-	return
-})
+useAuth(app)
+useApiDocs(app)
+useErrors(app)
 
 module.exports = app

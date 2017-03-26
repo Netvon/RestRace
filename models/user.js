@@ -1,8 +1,30 @@
 const	mongoose	= require('mongoose'),
-        slug		= require('mongoose-document-slugs'),
-        Schema		= mongoose.Schema;
+        bcrypt      = require('bcryptjs'),
+        mongooseHidden = require('mongoose-hidden')(),
+        Schema		= mongoose.Schema
 
 var userSchema = new mongoose.Schema({
+
+    local: {
+        username: {
+            type:String,
+            required: true,
+            unique: true,
+            lowercase: true
+        },
+
+        password: {
+            type:String,
+            required: true,
+            hide: true
+        },
+    },
+
+    roles: {
+		type: [String],
+		default: ['user'],
+        lowercase: true
+	},
 
     firstname: {
         type:String,
@@ -13,16 +35,39 @@ var userSchema = new mongoose.Schema({
         type: String
     },
 
-    races:[{
-        type: Schema.ObjectId, ref:"Race"
-    }],
+    races: [{
+        type: Schema.ObjectId, ref: 'Race'
+    }]
 
-    meta: {
-        createdOn: { type: Date, default: Date.now },
-        isEnabled: { type: Boolean, default: true }
-    }
+}, { timestamps: true })
+
+userSchema.plugin(mongooseHidden)
+
+userSchema.pre('save', function(next) {
+    this.local.password = bcrypt.hashSync(this.local.password, 10)
+    
+    next()
 })
 
-// raceSchema.plugin(slug, { sourceField: 'name' })
+userSchema.virtual('fullName').get(function() {
+    return `${this.firstname} ${this.lastname}`
+})
 
-mongoose.model('User', userSchema)
+userSchema.statics.validateUsernamePassword = async function(username, password) {
+    let user = await this.findOne({'local.username': username })
+
+    if(user == null)
+        return false
+
+    return { valid: user.validatePassword(password), user }
+}
+
+userSchema.methods.validatePassword = function(password) {
+    return bcrypt.compareSync(password, this.local.password)
+}
+
+userSchema.methods.isInRole = function(role) {
+    return this.roles.includes(role)
+}
+
+module.exports = mongoose.model('User', userSchema)

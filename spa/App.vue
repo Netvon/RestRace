@@ -1,17 +1,10 @@
 <template>
 	<div id="app">
-		<ul class="race-list">
-			<li class="race-item box" v-for="race in races">
-				<h4 class="title is-4">{{ race.name }} <span class="tag is-dark">{{ race.status }}</span></h4>
-				<p>{{ race.description || 'No description' }}</p>				
-			</li>
-		</ul>
-
-		<ul class="log-list">
-			<li class="log-item" v-for="message in messages">
+		<div class="log-list">
+			<div class="notification is-primary log-item" v-for="message in messages">
 				{{ message }}
-			</li>
-		</ul>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -23,8 +16,7 @@ export default {
 	name: 'app',
 	data() {
 		return {
-			messages: [],
-			races: []
+			messages: []
 		}
 	},
 
@@ -44,11 +36,6 @@ export default {
 		msg: function(val) {
 			this.messages.push(val)
 		}
-	},
-
-	async mounted() {
-		let races = await axios.get('http://localhost:3000/api/races')
-		this.races = races.data
 	}
 }
 </script>
@@ -56,44 +43,26 @@ export default {
 <style lang="scss">
 
 .log-list {
-	list-style: none;
     margin: 0;
     padding: 0;
 }
 
 .log-item {
-	background: #373737;
-    color: #d5d5d5;
-    padding: .5em;
     font-family: monospace;
-    border-bottom: 1px solid #4d4d4d;
 }
 
-.race-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-	background: white;
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.race-item {
-    padding: .5em;
-    background: #f6f6f6;
+.main-section {
+	flex-grow: 1;
 }
 
 #app {
     font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 
-pre {
-	margin: 0;
-}
-
 body {
 	margin: 0;
     min-height: 100vh;
-    background: #474747;
+	display: flex;
+	flex-direction: column;
 }
 </style>

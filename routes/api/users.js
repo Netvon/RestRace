@@ -1,11 +1,9 @@
-
-var express = require('express'),
+let express = require('express'),
     router	= module.exports = express.Router(),
-    mongoose = require('mongoose'),
-    User = mongoose.model('User');
+    User = require('../../models/user')
 
 
-function getUsers(req, res){
+function getUsers(req, res, next) {
     var query = {};
     if(req.params.userId){
         query._id = req.params.userId;
@@ -22,20 +20,24 @@ function getUsers(req, res){
         })
 }
 
-function addUser(req, res){
+function addUser(req, res, next) {
 
     let user = new User({
         firstname: req.body.firstname,
         lastname: req.body.lastname,
+        
+        local: {
+            username: req.body.username,
+            password: req.body.password
+        }
+        
     })
 
-    user.save().then(({_id, firstname, lastname }) => {
+    user.save().then(({_id, username, firstname, lastname }) => {
         res.setHeader('Location', req.originalUrl + '/' + _id)
-        res.status(201).json({_id, firstname, lastname })
+        res.status(201).json({_id, username, firstname, lastname })
     }).catch(reason => {
-        let error = new Error(reason)
-        error.status = 500
-        throw error
+        next(reason)
     })
 
 }
@@ -57,7 +59,6 @@ function updateUser(req, res){
 
     User.findByIdAndUpdate(req.params.userId, req.body)
         .then(({_id, firstname, lastname }) => {
-            res.setHeader('Location', req.originalUrl + '/' + _id)
             res.status(201).json({_id, firstname, lastname })
         })
         .catch(reason => {
@@ -97,9 +98,7 @@ router.get('/search/:searchText', (req, res, next) => {
 })
 
 // POST /api/users
-router.post('/', (req, res, next) => {
-    addUser(req,res)
-})
+router.post('/', addUser)
 
 // DELETE /api/users/:userId
 router.delete('/:userId', (req, res, next) => {

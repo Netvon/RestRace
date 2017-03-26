@@ -1,31 +1,35 @@
-const express = require('express'),
-	router	= module.exports = express.Router(),
-	mongoose = require('mongoose'),
-    Team = mongoose.model('Team'),
-	Race = mongoose.model('Race'),
-    { NotFoundError, ValidationError } = require('../../models/errors')
+const   express     = require('express'),
+        router      = module.exports = express.Router(),
+        mongoose    = require('mongoose'),
+        Team        = require('../../models/team'),
+        Race        = require('../../models/race'),
+        { NotFoundError, ValidationError } = require('../../models/errors')
 
 router.param('raceId', (req, res, next, raceId) => {
     req.requestedRaceId = raceId
 
     req.realtime.send('race-resolved', `Resolved Race with id '${raceId}'`)
+    //req.fields
+    let db = Race.findSingleById(raceId)
 
-    Race.findSingleById(raceId)
-        .then(race => {
-            if(race === null)
-                next(new NotFoundError(`Race with id ${raceId} not found`))
-            else {
-                res.race = race
-                next()
-            }            
-        })
-        .catch(reason => {
+    if(req.fields && req.fields.length > 0)
+        db = Race.findSingleById(raceId, req.fields.join(' '))
 
-            if('CastError' === err.name && 'ObjectId' === err.kind)
-                next(new NotFoundError(`Race with id ${raceId} not found`))
-            else
-                next(reason)
-        })
+    db.then(race => {
+        if(race === null)
+            next(new NotFoundError(`Race with id ${raceId} not found`))
+        else {
+            res.race = race
+            next()
+        }            
+    })
+    .catch(reason => {
+
+        if('CastError' === err.name && 'ObjectId' === err.kind)
+            next(new NotFoundError(`Race with id ${raceId} not found`))
+        else
+            next(reason)
+    })
 })
 
 
@@ -34,8 +38,14 @@ function getRaces(req, res, next) {
     if(res.race) {
         res.json(res.race)
     } else {
-        Race.findAll()
-            .then(data => res.json(data))
+
+        let db = Race.findAll()
+        Race.find({}, '', {})
+
+        if(req.fields && req.fields.length > 0)
+            db = Race.findAll(req.fields.join(' '))
+
+        db.then(data => res.json(data))
             .catch(err => next(err))
     }
 }

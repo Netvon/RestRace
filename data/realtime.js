@@ -1,6 +1,10 @@
 module.exports = function(app, server) {
 	let io = require('socket.io')(server)
 
+	io.on('connection', socket => {
+		socket.send('Welcome')
+	})
+
 	let realtime = new Realtime(io)
 
 	app.set('realtime', realtime)
