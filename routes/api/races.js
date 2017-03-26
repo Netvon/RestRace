@@ -4,11 +4,14 @@ const   express     = require('express'),
         Team        = require('../../models/team'),
         Race        = require('../../models/race'),
         Pub         = require('../../models/pub'),
+        qh          = require('../../middlewares/queryHandlers'),
         { NotFoundError, ValidationError } = require('../../models/errors'),
         GooglePlaces = require('google-places'),
         places = new GooglePlaces('AIzaSyDTnFknpxRhzZHkCegKD0IhjfYWxb-WU14')
 
 router.param('raceId', (req, res, next, raceId) => {
+    qh.projectable(req, res, () => {})
+
     req.requestedRaceId = raceId
 
     req.realtime.send('race-resolved', `Resolved Race with id '${raceId}'`)
@@ -16,7 +19,7 @@ router.param('raceId', (req, res, next, raceId) => {
     let db = Race.findSingleById(raceId)
 
     if(req.fields && req.fields.length > 0)
-        db = Race.findSingleById(raceId, req.fields.join(' '))
+        db = Race.findSingleById(raceId, req.fields)
 
     db.then(race => {
         if(race === null)
@@ -43,13 +46,21 @@ function getRaces(req, res, next) {
     } else {
 
         let db = Race.findAll()
-        Race.find({}, '', {})
 
-        if(req.fields && req.fields.length > 0)
-            db = Race.findAll(req.fields.join(' '))
+        if(req.fields)
+            db = Race.findAll(req.fields)
+
+        if(req.sortFields)
+            db = db.sort(req.sortFields)
+
+        if(req.limit)
+            db = db.limit(req.limit)
+
+        if(req.skip)
+            db = db.skip(req.skip)
 
         db.then(data => res.json(data))
-            .catch(err => next(err))
+          .catch(err => next(err))
     }
 }
 
@@ -146,20 +157,20 @@ function deleteRace(req, res, next) {
 
     res.race.remove()
         .then(race => {
-            res.status(200).json({ message: `Race with id ${req.requestedRaceId} removed`})
+            res.status(200).json({ message: `Race with id ${req.requestedRaceId} removed` })
         })
         .catch(reason => next(reason))
 }
 
 function updateRace(req, res, next){
 
-    Race.update({_id: req.params.race_Id }, { 
+    Race.update({ _id: req.params.race_Id }, { 
         name: req.body.name,
         starttime: req.body.starttime,
         status: req.body.starttime
     }, { $addToSet: req.body.tags })
     .then(updated => {
-        res.status(201).json({message: `Race with id ${req.requestedRaceId} updated`})
+        res.status(201).json({ message: `Race with id ${req.requestedRaceId} updated` })
     })
     .catch(reason => {
         if('ValidationError' === reason.name)
@@ -177,8 +188,8 @@ function newTeam(raceId, teamname, callback){
         name: teamname
     })
     team.save().then(({_id}) => {
-        Race.findByIdAndUpdate(raceId, {"$push": {"teams": _id}}, function(err, response){
-            callback({_id:_id, name:teamname});
+        Race.findByIdAndUpdate(raceId, { "$push": { "teams": _id }}, function(err, response) {
+            callback({ _id:_id, name:teamname });
         })
     })
 }
@@ -195,21 +206,14 @@ function addTeam(req, res, next){
 
 function addPub(req, res, next) {
 
-    places.details({placeid: req.body.placeId}, function(err, response) {
-        res.status(201).json(response);
-    });
-
-
+    places.details({ placeid: req.body.placeId }, function(err, response) {
+        res.status(201).json(response)
+    })
 }
-
-
-
-
-
 
 // GET /api/races
 // GET /api/races/:raceId
-router.get('/:raceId?', getRaces)
+router.get('/:raceId?', qh.projectable, qh.limitable, qh.skippable, qh.sortable, getRaces)
 
 // POST /api/races
 router.post('/', addRace)
