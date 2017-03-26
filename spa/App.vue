@@ -22,7 +22,7 @@ export default {
 
 	sockets: {
 		"race-added": function(val) {
-			this.messages.push(val)
+			this.messages.push({ key: "race-added", val })
 		},
 
 		"race-resolved": function(val) {

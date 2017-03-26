@@ -4,7 +4,8 @@
   "description": "An application for creating and managing Bar Tours",
   "main": "app.js",
   "scripts": {
-    "start": "node bin/server.js"
+    "start": "node bin/server.js",
+    "test": "mocha --timeout 10000"
   },
   "dependencies": {
     "axios": "^0.15.3",
@@ -31,14 +32,17 @@
     "vue-socket.io": "^2.1.0"
   },
   "devDependencies": {
-    "webpack": "~2.2.1",
-    "vue-loader": "^11.1.4",
     "babel-core": "^6.24.0",
     "babel-loader": "^6.4.0",
     "babel-preset-latest": "^6.0.0",
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "css-loader": "^0.27.3",
+    "mocha": "^3.2.0",
     "node-sass": "^4.5.0",
     "sass-loader": "^5.0.1",
-    "css-loader": "^0.27.3",
-    "vue-template-loader": "^0.2.4"
+    "vue-loader": "^11.1.4",
+    "vue-template-loader": "^0.2.4",
+    "webpack": "~2.2.1"
   }
 }

@@ -13,3 +13,5 @@ server.listen(port)
 server.on('listening', () => {
   debug('Listening on ' + port)
 })
+
+module.exports = app

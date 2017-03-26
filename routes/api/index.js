@@ -25,6 +25,33 @@ module.exports = function(app, express = require('express')) {
 
 		next()
 	})
+
+	router.use((req, res, next) => {
+
+		req.sortFields = []	
+			
+		if(req.query.sort) {
+			let arr = req.query.fields.split(',') || []
+			req.sort = {}
+
+			for (var key in arr) {
+				if (arr.hasOwnProperty(key)) {
+					var element = arr[key];
+					
+				}
+			}
+		}
+			
+
+		res.projectJson = (obj) => {
+			if(req.fields && req.field.length > 0)
+				res.json(lodash.pick(obj, req.fields))
+			else
+				res.json(obj)
+		}
+
+		next()
+	})
 	
 	router.use('/races', require('./races'))	
 	router.use('/users', require('./users'))
