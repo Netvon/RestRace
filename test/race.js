@@ -8,7 +8,6 @@ let should = chai.should()
 
 chai.use(chaiHttp)
 
-
 describe('Race', () => {
 	describe('/GET Races', () => {
 		it('It should GET all races', done => {

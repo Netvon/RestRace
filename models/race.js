@@ -31,16 +31,11 @@ var raceSchema = new mongoose.Schema({
         required: true,
     },
 
-	tags: [String],
-	
-	meta: {
-		createdOn: { type: Date, default: Date.now },
-		updatedOn: { type: Date },
-		isEnabled: { type: Boolean, default: true }
-	}	
+	tags: [String]
+
 }, { timestamps: true })
 
-const defaultProjection = '_id name description status starttime pubs teams'
+const defaultProjection = '_id name description status starttime pubs teams tags'
 const defaultPopulate = [{
 	path: 'teams',
 	model: 'Team',
@@ -108,6 +103,10 @@ raceSchema.methods.addNewPub = function(placeId) {
             })
             .catch(err => reject(err))
     })
+}
+
+raceSchema.methods.takeValuesFrom = function(object) {
+	//Object.
 }
 
 raceSchema.plugin(slug, { sourceField: 'name' })

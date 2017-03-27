@@ -27,8 +27,7 @@ var userSchema = new mongoose.Schema({
 	},
 
     firstname: {
-        type:String,
-        required: true
+        type:String
     },
 
     lastname: {

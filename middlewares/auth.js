@@ -1,37 +1,103 @@
-module.exports = function(app = require('express')()) {
+module.exports.useAuth = function(app = require('express')()) {
+
+	useLocal(app)
+	useJwt(app)
+
+}
+
+module.exports.isLocalAuthenticated = (req, res, next) => {
+	if(req.isAuthenticated())
+		next()
+	else
+		res.redirect('/login')
+}
+
+module.exports.isJWTAuthenticated = (req, res, next) => {
+	if(req.isAuthenticated())
+		next()
+	else {
+		res.header('WWW-Authenticate', 'Bearer token_type="JWT"')
+		res.status(401).json({ error: { status: 401, message: 'Unauthorized' }})
+	}
+}
+
+function useLocal(app) {
 	/** local */
-	// let sessions = require('express-session')
-	// let passport = require('passport')
-	// let LocalStrategy = require('passport-local').Strategy
+	let sessions = require('express-session')
+	let passport = require('passport')
+	let LocalStrategy = require('passport-local').Strategy
 
-	// let User = require('../models/user')
+	let User = require('../models/user')
 	
-	// app.use(require('express-session')({
-	// 	secret: process.env.SESSION_SECRET || 'default',
-	// 	resave: false,
-	// 	saveUninitialized: false
-	// }))
-	
+	app.use(require('express-session') ( {
+		secret: process.env.SESSION_SECRET || 'default',
+		resave: false,
+		saveUninitialized: false
+	}))
 
-	// app.use(passport.initialize())
-	// app.use(passport.session())
+	passport.serializeUser((user, done) => {
+        done(null, user.id)
+    })
 
-	// passport.use(new LocalStrategy (
-	// 	async function(username, password, done) {
-	// 		try {
-	// 			let args = await User.validateUsernamePassword(username, password)
+    passport.deserializeUser(async (id, done) => {
+        let user = await User.findById(id)
+		done(null, user)
+    })
 
-	// 			if(args.valid)
-	// 				done(null, args.user)
-	// 			else
-	// 				done(null, false)
+	app.use(passport.initialize())
+	app.use(passport.session())
+	app.use(require('connect-flash')())
 
-	// 		} catch (error) {
-	// 			done(err)
-	// 		}
-	// 	}
-	// ))
+	passport.use('local-login', new LocalStrategy ({ passReqToCallback: true },
+		async function(req, username, password, done) {
+			try {
+				let args = await User.validateUsernamePassword(username, password)
 
+				if(args.valid)
+					done(null, args.user, req.flash('success', 'You have been logged in' ))
+				else
+					done(null, null, req.flash('danger', 'Signin failed'))
+
+			} catch (error) {
+				done(err, null, req.flash('danger', 'Signin failed'))
+			}
+		}
+	))
+
+	passport.use('local-signup', new LocalStrategy({ passwordField: 'password', usernameField: 'username', passReqToCallback: true },
+		async function(req, username, password, done) {
+			try {
+				let user = await User.create({'local.username': username, 'local.password': password })
+
+				done(null, user, req.flash('success', 'Your account has been created'))
+			} catch (error) {
+				done(error, false, req.flash('danger', 'Signup failed'))
+			}
+			
+		}
+	))
+
+	app.post('/signup', passport.authenticate('local-signup', {
+        successRedirect : '/',
+        failureRedirect : '/signup',
+        failureFlash : true,
+		successFlash: true
+    }))
+
+	app.post('/login', passport.authenticate('local-login', {
+        successRedirect : '/',
+        failureRedirect : '/login',
+        failureFlash : true,
+		successFlash: true
+    }))
+
+	app.get('/logout', (req, res, next) => {
+		req.logout()
+		res.redirect('/login')
+	})
+}
+
+function useJwt(app) {
 	/** JWT */
 	let passport = require('passport')
 	let jwt = require('jsonwebtoken')
@@ -63,6 +129,10 @@ module.exports = function(app = require('express')()) {
 	app.use(passport.initialize())
 
 	app.post('/auth/token', async (req, res, next) => {
+
+		if(req.isAuthenticated())
+			console.log('psst, i also work with local :)')
+
 		if(req.body.username && req.body.password) {
 			let args = await User.validateUsernamePassword(req.body.username, req.body.password)
 
@@ -88,5 +158,4 @@ module.exports = function(app = require('express')()) {
 	app.get("/auth/me", passport.authenticate('jwt', { session: false }), function(req, res) {
 		res.json(req.user);
 	})
-
 }

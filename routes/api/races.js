@@ -5,6 +5,7 @@ const   express     = require('express'),
         Race        = require('../../models/race'),
         Pub         = require('../../models/pub'),
         qh          = require('../../middlewares/queryHandlers'),
+        {isJWTAuthenticated} = require('../../middlewares/auth'),
         { NotFoundError, ValidationError } = require('../../models/errors'),
         GooglePlaces = require('google-places'),
         places = new GooglePlaces('AIzaSyDTnFknpxRhzZHkCegKD0IhjfYWxb-WU14')
@@ -161,7 +162,9 @@ function deleteRace(req, res, next) {
         .catch(reason => next(reason))
 }
 
-function updateRace(req, res, next){
+function updateRace(req, res, next) {
+
+    
 
     Race.update({ _id: req.params.race_Id }, { 
         name: req.body.name,
@@ -212,7 +215,7 @@ function addPub(req, res, next) {
 
 // GET /api/races
 // GET /api/races/:raceId
-router.get('/:raceId?', qh.projectable, qh.limitable, qh.skippable, qh.sortable, getRaces)
+router.get('/:raceId?', isJWTAuthenticated, qh.projectable, qh.limitable, qh.skippable, qh.sortable, getRaces)
 
 // POST /api/races
 router.post('/', addRace)

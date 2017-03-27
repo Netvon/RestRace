@@ -25,11 +25,11 @@ function getTeams(req, res, next){
 }
 
 
-function deleteTeam(req, res, next){
+function deleteTeam(req, res, next) {
 
 
-    Team.findById(req.params.teamId, function(err, team){
-        return team.remove(function(err){
+    Team.findById(req.params.teamId, function(err, team) {
+        return team.remove(function(err) {
             if(!err) {
                 Race.update({}, {$pull: {teams: team._id}}, function (err, numberAffected) {
                         console.log(numberAffected);

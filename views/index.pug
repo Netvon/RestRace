@@ -1,22 +1,8 @@
-doctype html
-html
-  head
-    title= 'rest-race'
-    link(href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.css' rel='stylesheet')
-  body
-    header(class= 'hero is-light')
-      div(class= 'hero-body')
-        div(class= 'container')
-          h1(class= 'title')= 'Rest Race'
-          h2(class= 'subtitle')= 'Manage Interface'
+extends layout.pug
 
-    section(class= 'section main-section')
-      div(class= 'container')
-        div(id='app')= 'Loading application'
+block content
+  div(id='app')= 'Loading application'
 
-    footer(class= 'footer')
-      div(class= 'container')
-        div(class= 'content has-text-centered')
-          p= 'Rest Race, by ...'
-
-    script(src='bundle.js')
+block auth
+  div(class= 'level-item')= user.local.username
+  a(class= 'button normal level-item' href= '/logout')= 'Logout'
