@@ -85,7 +85,7 @@ module.exports = function(app = require('express')()) {
 		}
 	})
 
-	app.get("/auth/me", passport.authenticate('jwt', { session: false }), function(req, res){
+	app.get("/auth/me", passport.authenticate('jwt', { session: false }), function(req, res) {
 		res.json(req.user);
 	})
 

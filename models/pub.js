@@ -27,4 +27,4 @@ pubSchema.statics.createPub = function(pub) {
 }
 
 
-module.exports =  mongoose.model('Pub', pubSchema)
+module.exports = mongoose.model('Pub', pubSchema)

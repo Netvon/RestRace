@@ -67,20 +67,19 @@ function getRaces(req, res, next) {
 
 function addRace(req, res, next) {
 
-
     let race = new Race({
         name: req.body.name,
         description: req.body.description,
         starttime: new Date(req.body.starttime)
     })
 
-    if(req.body.tags){
+    if(req.body.tags) {
         req.body.tags.forEach(tag => race.tags.addToSet(tag))
     }
 
     race.save()
-        .then(({_id, name, description, starttime, teams, pubs }) => {
-            req.realtime.send('race-added', {_id, name, description, starttime })
+        .then(({ _id, name, description, starttime, teams, pubs }) => {
+            req.realtime.send('race-added', { _id, name, description, starttime })
 
             let addedTeams = []
             let addedPubs = []
