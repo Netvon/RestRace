@@ -1,8 +1,15 @@
 extends layout.pug
 
+block precontent
+	header(class= 'hero is-primary is-bold')
+		div(class= 'hero-body')
+			div(class= 'container')
+				h1(class= 'title')= 'Welcome'
+				h2(class= 'subtitle')= 'Welcome to the RestRace Web Interface'
+
 block content
-  div(id='app')= 'Loading application'
+	div(id='app')= 'Loading application'
 
 block auth
-  div(class= 'level-item')= user.local.username
-  a(class= 'button normal level-item' href= '/logout')= 'Logout'
+	a(class= 'nav-item is-tab' href= '/me')= user.local.username
+	a(class= 'nav-item is-tab' href= '/logout')= 'Logout'

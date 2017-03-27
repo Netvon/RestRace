@@ -1,8 +1,18 @@
 <template>
 	<div id="app">
 		<div class="log-list">
-			<div class="notification is-primary log-item" v-for="message in messages">
-				{{ message }}
+			<div v-for="message in messages">
+				<div class="message is-info">
+					<div class="message-header">
+						<p>{{ message.type }} <span class="tag" v-if="message.val.error.status">{{ message.val.error.status}}</span></p>
+					</div>
+					<div class="message-body">
+						<p>{{ message.val.error.message }}</p>
+						<figure class="highlight" v-if="message.val.error.stack">
+							<pre><code>{{ message.val.error.stack }}</code></pre>
+						</figure>
+					</div>
+				</div>				
 			</div>
 		</div>
 	</div>
@@ -22,19 +32,19 @@ export default {
 
 	sockets: {
 		"race-added": function(val) {
-			this.messages.push({ key: "race-added", val })
+			this.messages.push({type: 'race-added', val })
 		},
 
 		"race-resolved": function(val) {
-			this.messages.push(val)
+			this.messages.push({type: 'race-resolved', val })
 		},
 
 		error: function(val) {
-			this.messages.push(val)
+			this.messages.push({ type: 'error', val })
 		},
 
 		msg: function(val) {
-			this.messages.push(val)
+			this.messages.push({ type: 'message', val })
 		}
 	}
 }

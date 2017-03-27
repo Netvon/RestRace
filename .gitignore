@@ -111,3 +111,4 @@ typings/
 desktop.ini
 
 public/bundle.js
+coverage/

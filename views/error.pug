@@ -1,8 +1,11 @@
 doctype html
 html
-  head
-    title= 'An error occured'
-    link(href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.css' rel='stylesheet')
-  body
-    div= 'Something went wrong :('
-    pre= `${status}: ${message}`
+	head
+		title= 'An error occured'
+		link(href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.css' rel='stylesheet')
+	body
+		section(class= 'hero is-dark is-fullheight')
+			div(class= 'hero-body')
+				div(class= 'container has-text-centered')
+					p(class= 'title')= 'Something went wrong 😢'
+					p(class= 'subtitle')= `${error.status}: ${error.message}`

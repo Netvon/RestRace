@@ -6,19 +6,17 @@ html
 		block styles
 
 	body
-		header(class= 'hero is-light')
-			div(class= 'hero-body')
+		header
+			nav(class= 'nav has-shadow')
 				div(class= 'container')
-					div(class= 'level')
-						div(class= 'level-left')
-							div
-								h1(class= 'title')= 'Rest Race'
-								h2(class= 'subtitle')= 'Manage Interface'
-						div(class= 'level-right')
-							div(class= 'level')
-								block auth
-									a(class= 'button normal level-item' href= '/login')= 'Login'
+					div(class= 'nav-left')
+						a(class= 'nav-item')= 'RestRace'
+					div(class= 'nav-right')
+						block auth
+							a(class= 'nav-item is-tab' href= '/login')= 'Login'
 
+		block precontent
+			
 		section(class= 'section main-section')
 			div(class= 'container')
 				if notifications

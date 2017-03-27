@@ -9,7 +9,7 @@ module.exports = function(app) {
 
 	// setup global error handler
 	app.use((err, req, res, next) => {
-		app.get('realtime').send('error', err)
+		
 
 		err.status = err.status || 500
 
@@ -31,6 +31,8 @@ module.exports = function(app) {
 		} else {
 			res.render('error', errObj)
 		}
+
+		app.get('realtime').send('error', errObj)
 
 		return
 	})

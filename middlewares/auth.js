@@ -16,9 +16,20 @@ module.exports.isJWTAuthenticated = (req, res, next) => {
 	if(req.isAuthenticated())
 		next()
 	else {
-		res.header('WWW-Authenticate', 'Bearer token_type="JWT"')
+		res.header('WWW-Authenticate', 'Bearer token_type="JWT"') 
 		res.status(401).json({ error: { status: 401, message: 'Unauthorized' }})
 	}
+}
+
+module.exports.isInRole = function(role) {
+	return (req, res, next) => {
+		if(req.isAuthenticated()) {
+			if(req.user.roles && req.user.roles.length > 0 && req.user.roles.includes(role))
+				next()
+			else
+				res.status(403).json({ error: { status: 403, message: 'Forbidden' }})
+		}
+	}	
 }
 
 function useLocal(app) {
