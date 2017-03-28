@@ -49,7 +49,7 @@ const defaultPopulate = [{
 }, {
     path: 'pubs',
     model: 'Pub',
-    select: '_id name',
+    select: '_id name lon lat',
 }]
 
 raceSchema.statics.findAll = function(projection = defaultProjection, populateOptions = defaultPopulate) {
