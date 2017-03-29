@@ -44,7 +44,7 @@ function addUser(req, res, next) {
 }
 
 
-function deleteUser(req, res){
+function deleteUser(req, res) {
 
     User.findByIdAndRemove(req.params.userId, function(err, response){
         if(err){
@@ -56,7 +56,7 @@ function deleteUser(req, res){
 
 }
 
-function updateUser(req, res){
+function updateUser(req, res) {
 
     User.findByIdAndUpdate(req.params.userId, req.body)
         .then(({_id, firstname, lastname }) => {

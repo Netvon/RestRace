@@ -40,7 +40,7 @@ router.param('raceId', (req, res, next, raceId) => {
 })
 
 
-function getRaces(req, res, next) {
+async function getRaces(req, res, next) {
 
     if(res.race) {
         res.json(res.race)
@@ -57,10 +57,11 @@ function getRaces(req, res, next) {
         if(req.limit)
             db = db.limit(req.limit)
 
-        if(req.skip)
+        if(req.skip !== null || req.skip !== undefined)
             db = db.skip(req.skip)
 
-        db.then(data => res.json(data))
+        let count = await Race.count()
+        db.then(data => res.paginate(data, count))
           .catch(err => next(err))
     }
 }
@@ -218,16 +219,16 @@ function addPub(req, res, next) {
 router.get('/:raceId?', qh.projectable, qh.limitable, qh.skippable, qh.sortable, getRaces)
 
 // POST /api/races
-router.post('/', addRace)
+router.post('/', isJWTAuthenticated, addRace)
 
 // POST /api/races/:raceId/addteam
-router.post('/:raceId/addteam', addTeam)
+router.post('/:raceId/addteam', isJWTAuthenticated, addTeam)
 
 // POST /api/races/:raceId/addpub
-router.post('/:raceId/addteam', addPub)
+router.post('/:raceId/addteam', isJWTAuthenticated, addPub)
 
 // DELETE /api/races/:raceId
-router.delete('/:raceId', deleteRace)
+router.delete('/:raceId', isJWTAuthenticated, deleteRace)
 
 // PATCH /api/races/:race_Id
-router.patch('/:race_Id', updateRace)
+router.patch('/:race_Id', isJWTAuthenticated, updateRace)
