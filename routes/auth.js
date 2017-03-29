@@ -23,7 +23,7 @@ module.exports = function(app, express) {
 		if(req.isAuthenticated())
 			res.redirect('/')
 		else
-			res.render('login', { notifications: req.flash() })
+			res.render('login', { notifications: req.flash(), i18n: req.i18n })
 	})	
 
 	router.post('/login', passport.authenticate('local-login', {

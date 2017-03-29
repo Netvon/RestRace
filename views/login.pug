@@ -3,23 +3,23 @@ extends layout.pug
 block content
 	div(class= 'card')
 		header(class= 'card-header')
-			p(class= 'card-header-title')= 'Login'
+			p(class= 'card-header-title')= i18n('Login')
 		div(class= 'card-content')
 			div(class= 'content')
 				form(method= 'post' action= '/login')
 					div(class= 'field')
-						label(name= 'username')= 'Username'
+						label(name= 'username')= i18n('Username')
 						p(class= 'control')
-							input(class= 'input' type= 'text' placeholder= 'username' name= 'username')
+							input(class= 'input' type= 'text' placeholder= i18n('Username') name= 'username')
 					div(class= 'field')
-						label(name= 'password')= 'Password'
+						label(name= 'password')= i18n('Password')
 						p(class= 'control')
-							input(class= 'input' type= 'password' placeholder= 'password' name= 'password')
-					div(class= 'field')
+							input(class= 'input' type= 'password' placeholder= i18n('Password') name= 'password')
+					div(class= 'field is-grouped')
 						p(class= 'control')
-							input(type= 'submit' class= 'button is-primary')
+							input(type= 'submit' class= 'button is-primary' value= i18n('Login'))
 						p(class= 'control')
-							a(class= 'button is-info' href= '/auth/facebook')= 'Login with Facebook'
+							a(class= 'button is-info' href= '/auth/facebook')= i18n('Login with Facebook')
 
 block auth
-	a(class= 'nav-item is-tab' href= '/register')= 'Register'
+	a(class= 'nav-item is-tab' href= '/register')= i18n('Register')

@@ -105,10 +105,6 @@ raceSchema.methods.addNewPub = function(placeId) {
     })
 }
 
-raceSchema.methods.takeValuesFrom = function(object) {
-	//Object.
-}
-
 raceSchema.plugin(slug, { sourceField: 'name' })
 
 module.exports = mongoose.model('Race', raceSchema)

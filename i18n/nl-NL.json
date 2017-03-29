@@ -1,3 +1,9 @@
 {
-	"Hello, World!": "Hallo, wereld!"
+	"Hello, World!": "Hallo, wereld!",
+
+	"Login with Facebook": "Inloggen met Facebook",
+	"Login": "Inloggen",
+	"Register": "Registreren",
+	"Username": "Gebruikersnaam",
+	"Password": "Wachtwoord"
 }

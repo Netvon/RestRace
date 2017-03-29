@@ -10,8 +10,8 @@ module.exports = function(app = require('express')(), location) {
 
 	app.use((req, res, next) => {
 		let language = req.query.lang || acceptLanguage.get(req.header('Accept-Language'))
-		
-		req.i18n = (key, ...format) => {
+
+		req.i18n = (key, ...params) => {
 
 			let output = key
 
@@ -25,7 +25,7 @@ module.exports = function(app = require('express')(), location) {
 				}
 			}
 
-			return format(output, ...format) 
+			return format(output, ...params) 
 		}
 
 		next()
