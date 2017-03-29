@@ -26,11 +26,21 @@ function searchPubs(req, res) {
 }
 
 
+function getPub(req, res, next){
+    var query = {};
 
-function getPlaceDetails(){
+    query._id = req.params.pubId;
 
+    var properties = "_id name placeId lon lat";
+
+    Pub.find(query, properties)
+        .then(data => {
+            if(req.params.id){
+                data = data[0];
+            }
+            return res.json(data);
+        })
 }
-
 
 
 
@@ -38,6 +48,8 @@ function getPlaceDetails(){
 router.post('/search', (req, res, next) => {
     searchPubs(req,res)
 })
+
+router.get('/:pubId', getPub)
 
 
 
