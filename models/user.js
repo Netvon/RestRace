@@ -8,16 +8,22 @@ var userSchema = new mongoose.Schema({
     local: {
         username: {
             type:String,
-            required: true,
             unique: true,
             lowercase: true
         },
 
         password: {
             type:String,
-            required: true,
             hide: true
         },
+    },
+
+    social: {
+        facebookId: {
+            type: String,
+            unique: true,
+            hide: true
+        }
     },
 
     roles: {
@@ -43,7 +49,8 @@ var userSchema = new mongoose.Schema({
 userSchema.plugin(mongooseHidden)
 
 userSchema.pre('save', function(next) {
-    this.local.password = bcrypt.hashSync(this.local.password, 10)
+    if(this.local.password)
+        this.local.password = bcrypt.hashSync(this.local.password, 10)
     
     next()
 })
@@ -52,7 +59,18 @@ userSchema.virtual('fullName').get(function() {
     return `${this.firstname} ${this.lastname}`
 })
 
+userSchema.virtual('hasFacebook').get(function() {
+    return this.social.facebookId != null
+})
+
+userSchema.methods.removeFacebook = async function() {
+    await this.update({ 'social.facebookId': null })
+}
+
 userSchema.statics.validateUsernamePassword = async function(username, password) {
+    if(!username || !password)
+        return false
+
     let user = await this.findOne({'local.username': username })
 
     if(user == null)

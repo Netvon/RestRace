@@ -1,0 +1,15 @@
+extends layout.pug
+
+block content
+	div(class= 'card')
+		div(class= 'card-content')
+			p(class= 'title is-2')= user.local.username
+			if user.firstname || user.lastname
+				p(class= 'subtitle')= (user.firstname || '') + ' ' +  (user.lastname || '')
+			div(class= 'content')
+				each role in user.roles
+					span(class= 'tag is-info is-medium')= role
+
+block auth
+	a(class= 'nav-item is-tab' href= '/me')= user.local.username
+	a(class= 'nav-item is-tab' href= '/logout')= 'Logout'

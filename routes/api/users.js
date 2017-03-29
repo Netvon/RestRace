@@ -1,6 +1,7 @@
 let express = require('express'),
     router	= module.exports = express.Router(),
-    User = require('../../models/user')
+    User = require('../../models/user'),
+    { isInRole, isJWTAuthenticated } = require('../../middlewares/auth')
 
 
 function getUsers(req, res, next) {
@@ -89,9 +90,7 @@ function searchUsers(req, res) {
 
 // GET /api/users
 // GET /api/users/:userId
-router.get('/:userId?', (req, res, next) => {
-    getUsers(req,res)
-})
+router.get('/:userId?', isJWTAuthenticated, isInRole('admin'), getUsers)
 
 router.get('/search/:searchText', (req, res, next) => {
     searchUsers(req,res)

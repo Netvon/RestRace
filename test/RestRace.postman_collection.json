@@ -1,0 +1,81 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RestRace",
+		"_postman_id": "8b78bc37-82f7-38ba-5394-d3766f1bb2f3",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:3000/auth/token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody)",
+							"postman.setGlobalVariable(\"RESTRACE_TOKEN\", jsonData.token)",
+							"",
+							"tests[\"Status code is 200\"] = responseCode.code === 200",
+							"tests[\"Body contains 'ok' message\"] = jsonData.message === \"ok\"",
+							"tests[\"Body contains token\"] = jsonData.token !== null || jsonData.token !== undefined"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:3000/auth/token",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"netvon\",\n\t\"password\": \"hallo\"\n}"
+				},
+				"description": "Request Token"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/users",
+			"request": {
+				"url": "http://localhost:3000/api/users",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "JWT {{RESTRACE_TOKEN}}",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Get All Users"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/auth/me",
+			"request": {
+				"url": "http://localhost:3000/auth/me",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "JWT {{RESTRACE_TOKEN}}",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Get Current User"
+			},
+			"response": []
+		}
+	]
+}

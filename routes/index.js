@@ -3,6 +3,9 @@ module.exports = function(app, express) {
 	let { isLocalAuthenticated, isInRole } = require('../middlewares/auth')
 
 	router.get('/', isLocalAuthenticated, (req, res, next) => {
+
+		console.log(req.i18n('Hello, World!'))
+
 		res.render('index', { user: req.user, notifications: req.flash() })
 	})
 

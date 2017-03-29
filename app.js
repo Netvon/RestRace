@@ -7,6 +7,7 @@ const 	express 	= require('express'),
 		connectDb	= require('./data'),
 		useApiDocs	= require('./middlewares/api-docs'),
 		useErrors	= require('./middlewares/errorHandling'),
+		useI18n		= require('./middlewares/i18n'),
 		{useAuth}	= require('./middlewares/auth'),
 		cors		= require('cors')
 
@@ -24,10 +25,11 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(cors())
 
+useI18n(app, path.join(__dirname, 'i18n'))
 useAuth(app)
 
 // setup routes middleware
-app.use('/', require('./routes/index')(app, express))
+app.use('/', require('./routes/auth')(app, express), require('./routes/index')(app, express))
 app.use('/api', require('./routes/api')(app, express))
 
 useApiDocs(app)

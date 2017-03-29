@@ -215,7 +215,7 @@ function addPub(req, res, next) {
 
 // GET /api/races
 // GET /api/races/:raceId
-router.get('/:raceId?', isJWTAuthenticated, qh.projectable, qh.limitable, qh.skippable, qh.sortable, getRaces)
+router.get('/:raceId?', qh.projectable, qh.limitable, qh.skippable, qh.sortable, getRaces)
 
 // POST /api/races
 router.post('/', addRace)
