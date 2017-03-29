@@ -74,7 +74,7 @@ function searchUsers(req, res) {
 
     var re = new RegExp('.*'+req.params.searchText+'.*', "i");
 
-    User.find().or([{ 'firstname': { $regex: re }}, { 'lastname': { $regex: re }}]).exec(function(err, users) {
+    User.find().or([{ 'local.username': { $regex: re }}]).exec(function(err, users) {
         if(err || !users){
             res.json({message: "Error in finding users with text: " + req.params.searchText});
         } else{

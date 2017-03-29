@@ -15,7 +15,7 @@ var teamSchema = new mongoose.Schema({
 
     ranking: [{
         pub:{type: Schema.ObjectId, ref: "Pub"},
-        timePassed: Date
+        time: Date
     }],
 
     endtime: {
@@ -57,7 +57,7 @@ teamSchema.statics.findAll = function() {
 }
 
 teamSchema.statics.findSingleById = function(_id) {
-    return this.findOne(_id, defaultProjection)
+    return this.findOne({_id}, defaultProjection)
                .populate("users", "firstname lastname races")
 }
 
@@ -73,6 +73,27 @@ teamSchema.statics.createWithNameOrDefaultName = function(teamName = null) {
     return this.create({
         name:  teamName || defaultTeamNames[~~Math.random() * defaultTeamNames.length]
     })
+}
+
+teamSchema.statics.findAndAddRanking = function (_id, pubIds) {
+
+    return new Promise((resolve, reject) => {
+        this.findOne({_id}, defaultProjection)
+            .populate("users", "firstname lastname races")
+            .then(team => {
+                pubIds.forEach(function (item, index) {
+                    team.ranking.push({pubId:item, time:new Date()})
+                })
+
+                team.save(function(err, team) {
+                    resolve(team)
+                })
+                    .catch(err => reject(err))
+
+            })
+            .catch(err => reject(err))
+    })
+
 }
 
 // raceSchema.plugin(slug, { sourceField: 'name' })
