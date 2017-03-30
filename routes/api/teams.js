@@ -13,7 +13,7 @@ router.param('teamId', (req, res, next, teamId) => {
 
     req.requestedTeamId = teamId
 
-    let db = Team.findSingleById(raceId, req.fields)
+    let db = Team.findSingleById(teamId, req.fields)
 
     db.then(team => {
         if(team === null)
@@ -82,7 +82,7 @@ function addUser(req, res, next){
         }
         else{
             Team.findByIdAndUpdate(req.params.teamId, {"$push": {"users": response._id}}, {new: true})
-                .populate("users", "firstname lastname")
+                .populate("users", "local.username races")
                 .then(({_id, name, users, ranking, endtime }) => {
                 res.setHeader('Location', req.originalUrl + '/' + _id)
                 res.status(201).json({_id, name, users, ranking, endtime})
@@ -103,7 +103,7 @@ function removeUser(req, res, next){
         }
         else{
             Team.findByIdAndUpdate(req.params.teamId, {"$pull": {"users": response._id}}, {new:true})
-                .populate("users", "firstname lastname")
+                .populate("users", "local.username races")
                 .then(({_id, name, users, ranking, endtime }) => {
                     res.setHeader('Location', req.originalUrl + '/' + _id)
                     res.status(201).json({_id, name, users, ranking, endtime})

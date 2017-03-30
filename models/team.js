@@ -57,12 +57,12 @@ let defaultProjection = '_id name users ranking endtime'
 
 teamSchema.statics.findAll = function() {
     return this.find({}, defaultProjection)
-               .populate("users", "firstname lastname races")
+               .populate("users", "local.username races")
 }
 
 teamSchema.statics.findSingleById = function(_id) {
     return this.findOne({_id}, defaultProjection)
-               .populate("users", "firstname lastname races")
+               .populate("users", "local.username races")
 }
 
 teamSchema.methods.removeUser = function() {
@@ -86,7 +86,7 @@ teamSchema.statics.findAndAddRanking = function (_id, pubIds) {
             .populate("users", "firstname lastname races")
             .then(team => {
                 pubIds.forEach(function (item, index) {
-                    team.ranking.push({pubId:item, time:new Date()})
+                    team.ranking.push({pub:item, time:new Date()})
                 })
 
                 team.save(function(err, team) {

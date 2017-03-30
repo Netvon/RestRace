@@ -45,11 +45,15 @@ const defaultPopulate = [{
 	model: 'Team',
 	select: '_id name users ranking',
 	options: { sort: { name: 1 } },
-	populate: {
+	populate: [{
 		path: 'users',
 		model: 'User',
-		select: '_id firstname lastname'
-	}
+		select: '_id local.username races'
+	},{
+        path: 'ranking.pub',
+        model: 'Pub',
+        select: '_id name'
+    }]
 }, {
     path: 'pubs',
     model: 'Pub',
