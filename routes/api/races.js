@@ -134,21 +134,6 @@ function addRace(req, res, next) {
  */
 function deleteRace(req, res, next) {
 
-    // Voorbeeld voor het verwijderen van alle teams in de race
-
-    // Team.findById(req.params.teamId, function(err, team){
-    //     return team.remove(function(err){
-    //         if(!err) {
-    //             Race.update({}, {$pull: {teams: team._id}}, function (err, numberAffected) {
-    //                 console.log(numberAffected);
-    //             })
-    //         } else {
-    //             console.log(err);
-    //         }
-    //         res.status(201).json({return:"return"})
-    //     });
-    // });
-
     res.race.remove()
         .then(race => {
             res.status(200).json({ message: `Race with id ${req.requestedRaceId} removed` })
@@ -185,19 +170,6 @@ function updateRace(req, res, next) {
 }
 
 
-function newTeam(raceId, teamname, callback){
-    console.log(teamname)
-    var team = new Team({
-        name: teamname
-    })
-    team.save().then(({_id}) => {
-        Race.findByIdAndUpdate(raceId, { "$push": { "teams": _id }}, function(err, response) {
-            callback({ _id:_id, name:teamname });
-        })
-    })
-}
-
-
 function addTeam(req, res, next){
 
     res.race.addNewTeam(req.body.name)
@@ -207,12 +179,15 @@ function addTeam(req, res, next){
 }
 
 
-function addPub(req, res, next) {
+function checkLocation(req, res, next) {
 
-    places.details({ placeid: req.body.placeId }, function(err, response) {
-        res.status(201).json(response)
-    })
+    res.race.checkLocation(req.params.raceId, req.body.teamId, req.body.lon, req.body.lat)
+        .then(x => res.status(201).json(x))
+        .catch(reason => next(reason))
+
 }
+
+
 
 // GET /api/races
 // GET /api/races/:raceId
@@ -224,8 +199,8 @@ router.post('/', isJWTAuthenticated, addRace)
 // POST /api/races/:raceId/addteam
 router.post('/:raceId/addteam', isJWTAuthenticated, addTeam)
 
-// POST /api/races/:raceId/addpub
-router.post('/:raceId/addteam', isJWTAuthenticated, addPub)
+// POST /api/races/:raceId/checklocation
+router.post('/:raceId/checklocation', isJWTAuthenticated, checkLocation)
 
 // DELETE /api/races/:raceId
 router.delete('/:raceId', isJWTAuthenticated, deleteRace)

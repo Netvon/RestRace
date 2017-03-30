@@ -129,6 +129,31 @@ raceSchema.methods.addNewPub = function(placeId) {
     })
 }
 
+raceSchema.methods.checkLocation = function(raceId, teamId, lon, lat) {
+    return new Promise((resolve, reject) => {
+        require('./race').findSingleById(raceId, "pubs", [{path: 'pubs', model: 'Pub', select: '_id placeId name lon lat'}])
+            .then(race => {
+                if(race){
+                    var pubRankings = [];
+                    var team = require('./team');
+                    var maxDiff = 0.0001;
+                    race.pubs.forEach(function (item, index) {
+						if(lon <= item.lon+maxDiff && lon >= item.lon-maxDiff && lat <= item.lat+maxDiff && lat >= item.lat-maxDiff){
+							pubRankings.push(item._id)
+						}
+                    })
+
+                    team.findAndAddRanking(teamId, pubRankings)
+                        .then(team => {
+                            resolve(team);
+                        })
+                        .catch(err => reject(err))
+                }
+            })
+            .catch(err => reject(err))
+    })
+}
+
 raceSchema.plugin(slug, { sourceField: 'name' })
 
 module.exports = mongoose.model('Race', raceSchema)
