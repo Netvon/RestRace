@@ -98,15 +98,17 @@ function useFacebook(app) {
 
 function useLocal(app) {
 	/** local */
-	let sessions = require('express-session')	
+	let cookieParser = require('cookie-parser')
+	let session = require('express-session')	
 	let LocalStrategy = require('passport-local').Strategy
 
 	let User = require('../models/user')
 	
-	app.use(require('express-session') ( {
+	app.use(cookieParser())
+	app.use(session ( {
 		secret: process.env.SESSION_SECRET || 'default',
 		resave: false,
-		saveUninitialized: false
+		saveUninitialized: true
 	}))
 
 	passport.serializeUser((user, done) => {
@@ -118,6 +120,7 @@ function useLocal(app) {
 		done(null, user)
     })
 
+	
 	app.use(passport.initialize())
 	app.use(passport.session())
 	app.use(require('connect-flash')())

@@ -3,18 +3,18 @@ extends layout.pug
 block content
 	div(class= 'card')
 		header(class= 'card-header')
-			p(class= 'card-header-title')= 'Register'
+			p(class= 'card-header-title')= i18n('Register')
 		div(class= 'card-content')
 			div(class= 'content')
 				form(method= 'post' action= '/signup')
 					div(class= 'field')
-						label(name= 'username')= 'Username'
+						label(name= 'username')= i18n('Username')
 						p(class= 'control')
-							input(class= 'input' type= 'text' placeholder= 'username' name= 'username')
+							input(class= 'input' type= 'text' placeholder= i18n('Username') name= 'username')
 					div(class= 'field')
-						label(name= 'password')= 'Password'
+						label(name= 'password')= i18n('Password')
 						p(class= 'control')
-							input(class= 'input' type= 'password' placeholder= 'password' name= 'password')
+							input(class= 'input' type= 'password' placeholder= i18n('password') name= 'password')
 					div(class= 'field')
 						p(class= 'control')
-							input(type= 'submit' class= 'button is-primary')
+							input(type= 'submit' class= 'button is-primary')= i18n('Register')

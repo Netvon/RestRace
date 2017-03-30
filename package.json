@@ -27,6 +27,7 @@
     "mongoose-hidden": "^1.2.0",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.1",
+    "passport-google": "^0.3.0",
     "passport-jwt": "^2.2.1",
     "passport-local": "^1.0.0",
     "pug": "^2.0.0-beta11",
@@ -35,7 +36,8 @@
     "swagger-ui-express": "~1.0.5",
     "vue": "^2.2.4",
     "vue-bulma-card": "^1.0.2",
-    "vue-socket.io": "^2.1.0"
+    "vue-socket.io": "^2.1.0",
+    "cookie-parser": "^1.4.3"
   },
   "devDependencies": {
     "babel-core": "^6.24.0",

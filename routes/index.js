@@ -6,7 +6,7 @@ module.exports = function(app, express) {
 
 		console.log(req.i18n('Hello, World!'))
 
-		res.render('index', { user: req.user, notifications: req.flash() })
+		res.renderWithDefaults('index')
 	})
 
 	// router.get('/signup', (req, res, next) => {

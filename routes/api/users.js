@@ -1,24 +1,46 @@
 let express = require('express'),
     router	= module.exports = express.Router(),
     User = require('../../models/user'),
+    qh = require('../../middlewares/queryHandlers'),
+    { NotFoundError, ValidationError } = require('../../models/errors'),
     { isInRole, isJWTAuthenticated } = require('../../middlewares/auth')
 
+router.param('userId', async (req, res, next, userId) => {
+    qh.projectable(req, res, () => {})
 
-function getUsers(req, res, next) {
-    var query = {};
-    if(req.params.userId){
-        query._id = req.params.userId;
+    req.requestedUserId = userId
+
+    let db = User.findSingleById(userId, req.fields)
+
+    try {
+        res.dbUser = await db
+
+        if(res.dbUser == null)
+            next(new NotFoundError(`User with id ${raceId} not found`))
+        else {
+            next()
+        }
+
+    } catch (err) {
+        if('CastError' === err.name && 'ObjectId' === err.kind)
+            next(new NotFoundError(`User with id ${userId} not found`))
+        else
+            next(err)
     }
+})
 
-    var properties = "_id firstname lastname races";
+async function getUsers(req, res, next) {
 
-    User.find(query, properties)
-        .then(data => {
-            if(req.params.id){
-                data = data[0];
-            }
-            return res.json(data);
-        })
+    if(res.dbUser) {
+        res.json(res.dbUser)
+    } else {
+        try {
+            let users = await qh.applyToDb(req, User.findAll(req.fields))
+            res.paginate(users, await User.count())        
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 function addUser(req, res, next) {
@@ -34,9 +56,9 @@ function addUser(req, res, next) {
         
     })
 
-    user.save().then(({_id, username, firstname, lastname }) => {
-        res.setHeader('Location', req.originalUrl + '/' + _id)
-        res.status(201).json({_id, username, firstname, lastname })
+    user.save().then(newuser => {
+        res.setHeader('Location', req.originalUrl + '/' + newuser._id)
+        res.status(201).json(newuser)
     }).catch(reason => {
         next(reason)
     })
@@ -44,7 +66,7 @@ function addUser(req, res, next) {
 }
 
 
-function deleteUser(req, res) {
+function deleteUser(req, res, next) {
 
     User.findByIdAndRemove(req.params.userId, function(err, response){
         if(err){
@@ -56,17 +78,26 @@ function deleteUser(req, res) {
 
 }
 
-function updateUser(req, res) {
+function updateUser(req, res, next) {
 
     User.findByIdAndUpdate(req.params.userId, req.body)
         .then(({_id, firstname, lastname }) => {
             res.status(201).json({_id, firstname, lastname })
         })
         .catch(reason => {
-            let error = new Error(reason)
-            error.status = 500
-            throw error
+            next(reason)
         })
+
+}
+
+async function updateSelf(req, res, next) {
+
+    try {
+        res.json(await req.user.update(req.body))
+    } catch (error) {
+        next(error)
+    }
+    
 
 }
 
@@ -90,21 +121,16 @@ function searchUsers(req, res) {
 
 // GET /api/users
 // GET /api/users/:userId
-router.get('/:userId?', isJWTAuthenticated, isInRole('admin'), getUsers)
+router.get('/:userId?'/*, isJWTAuthenticated, isInRole('admin')*/, ...qh.all(), getUsers)
 
-router.get('/search/:searchText', (req, res, next) => {
-    searchUsers(req,res)
-})
+router.get('/search/:searchText', searchUsers)
 
 // POST /api/users
 router.post('/', addUser)
 
 // DELETE /api/users/:userId
-router.delete('/:userId', (req, res, next) => {
-    deleteUser(req,res)
-})
+router.delete('/:userId', deleteUser)
 
-// PATCH /api/users/:userId
-router.patch('/:userId', (req, res, next) => {
-    updateUser(req,res)
-})
+// PUT /api/users/:userId
+router.put('/:userId', isJWTAuthenticated, isInRole('admin'), updateUser)
+router.put('/', isJWTAuthenticated, updateSelf)

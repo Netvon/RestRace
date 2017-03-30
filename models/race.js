@@ -17,6 +17,10 @@ var raceSchema = new mongoose.Schema({
 			values: ['notstarted', 'started', 'ended']
 		}
 	},
+	
+	creator: {
+        type: Schema.ObjectId, ref: 'User'
+    },
 
     pubs: [{
         type: Schema.ObjectId, ref: 'Pub'
@@ -35,7 +39,7 @@ var raceSchema = new mongoose.Schema({
 
 }, { timestamps: true })
 
-const defaultProjection = '_id name description status starttime pubs teams tags'
+const defaultProjection = '_id name description status starttime pubs teams tags creator'
 const defaultPopulate = [{
 	path: 'teams',
 	model: 'Team',
@@ -50,6 +54,10 @@ const defaultPopulate = [{
     path: 'pubs',
     model: 'Pub',
     select: '_id name lon lat',
+}, {
+	path: 'creator',
+	model: 'User',
+	select: '_id local.username'
 }]
 
 raceSchema.statics.findAll = function(projection = defaultProjection, populateOptions = defaultPopulate) {
@@ -62,6 +70,22 @@ raceSchema.statics.findSingleById = function(_id, projection = defaultProjection
 
 raceSchema.statics.findSingle = function(params, projection = defaultProjection, populateOptions = defaultPopulate) {
 	return this.findOne(params, projection).populate(populateOptions)
+}
+
+raceSchema.statics.updateFromObject = function(id, object) {
+	let setTags = null
+
+	if(object.tags && typeof object.tags === 'array') {
+		setTags = { $addToSet: object.tags }
+	}
+
+	delete object._id
+	delete object.pubs
+	delete object.teams
+	delete object.owner
+
+
+	return this.findOneAndUpdate({ _id: id }, object, setTags, { runValidators: true })
 }
 
 raceSchema.methods.addNewTeam = function(teamName) {

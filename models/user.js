@@ -21,7 +21,6 @@ var userSchema = new mongoose.Schema({
     social: {
         facebookId: {
             type: String,
-            unique: true,
             hide: true
         }
     },
@@ -29,7 +28,8 @@ var userSchema = new mongoose.Schema({
     roles: {
 		type: [String],
 		default: ['user'],
-        lowercase: true
+        lowercase: true,
+        enum: ['user', 'admin']
 	},
 
     firstname: {
@@ -46,7 +46,7 @@ var userSchema = new mongoose.Schema({
 
 }, { timestamps: true })
 
-userSchema.plugin(mongooseHidden)
+userSchema.plugin(mongooseHidden, { hidden: { _id: false } })
 
 userSchema.pre('save', function(next) {
     if(this.local.password)
@@ -54,6 +54,19 @@ userSchema.pre('save', function(next) {
     
     next()
 })
+
+const defaultProjection = '_id fullName local.username roles'
+
+userSchema.statics.findAll = function(projection = defaultProjection, populateOptions = '') {
+    if(populateOptions == null)
+	    return this.find({}, projection)
+    
+    return this.find({}, projection).populate(populateOptions)
+}
+
+userSchema.statics.findSingleById = function(_id, projection = defaultProjection, populateOptions = '') {
+	return this.findOne({ _id }, projection).populate(populateOptions)
+}
 
 userSchema.virtual('fullName').get(function() {
     return `${this.firstname} ${this.lastname}`

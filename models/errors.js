@@ -40,7 +40,28 @@ function ValidationError(validationErrors, message = 'Validation Error', status 
 	return error
 }
 
+function AuthentificationError(reason, message = 'Authentification failed', status = 401) {
+	let error = new Error(message)
+	error.name = 'AuthentificationError'
+	error.status = status
+
+	if(reason) error.reason = reason
+
+	return error
+}
+
+function UnauthorizedError(reason, message = 'Unauthorized', status = 403) {
+	let error = new Error(message)
+	error.name = 'UnauthorizedError'
+	error.status = status
+
+	if(reason) error.reason = reason
+
+	return error
+}
+
 module.exports = {
+	AuthentificationError,
 	NotFoundError,
 	InternalServerError,
 	BadRequestError,

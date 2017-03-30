@@ -9,7 +9,7 @@ module.exports = function(app, express) {
 		if(req.isAuthenticated())
 			res.redirect('/')
 		else
-			res.render('register', { notifications: req.flash() })
+			res.renderWithDefaults('register')
 	})
 
 	router.post('/register', passport.authenticate('local-signup', {
@@ -23,7 +23,7 @@ module.exports = function(app, express) {
 		if(req.isAuthenticated())
 			res.redirect('/')
 		else
-			res.render('login', { notifications: req.flash(), i18n: req.i18n })
+			res.renderWithDefaults('login')
 	})	
 
 	router.post('/login', passport.authenticate('local-login', {
@@ -41,7 +41,10 @@ module.exports = function(app, express) {
 
 	router.post('/auth/token', async (req, res, next) => {
 
+		req.isApiCall = true
+		
 		let passportJWT = require('passport-jwt')
+		let {AuthentificationError} = require('../models/errors')
 
 		let ExtractJwt = passportJWT.ExtractJwt
 		let JwtStrategy = passportJWT.Strategy
@@ -57,7 +60,10 @@ module.exports = function(app, express) {
 		if(req.body.username && req.body.password) {
 			let args = await User.validateUsernamePassword(req.body.username, req.body.password)
 
-			if(args.valid) {
+			if(args === false) {
+				next(AuthentificationError('User not Found'))
+			}
+			else if(args.valid) {
 
 				var payload = { 
 					sub: args.user.id,
@@ -71,7 +77,7 @@ module.exports = function(app, express) {
 				res.json({ message: "ok", token: token })
 
 			} else {
-				res.status(401).json({ message: 'Auth failed' })
+				next(AuthentificationError('Password did not match'))
 			}
 		}
 	})
@@ -81,7 +87,7 @@ module.exports = function(app, express) {
 	})
 
 	router.get('/me', isLocalAuthenticated, function(req, res) {
-		res.render('me', {user: req.user})
+		res.renderWithDefaults('me')
 	})
 
 	return router

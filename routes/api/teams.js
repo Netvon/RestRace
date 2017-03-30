@@ -1,32 +1,54 @@
 const express = require('express'),
     router	= module.exports = express.Router(),
     mongoose = require('mongoose'),
-    Team = mongoose.model('Team'),
-    User = mongoose.model('User'),
-    Race = mongoose.model('Race');
+    qh = require('../../middlewares/queryHandlers'),
+    { NotFoundError, ValidationError } = require('../../models/errors'),
+    Team = require('../../models/team'),
+    User = require('../../models/user'),
+    Race = require('../../models/race')
 
 
-function getTeams(req, res, next){
-    var query = {};
-    if(req.params.teamId){
-        query._id = req.params.teamId;
+router.param('teamId', (req, res, next, teamId) => {
+    qh.projectable(req, res, () => {})
+
+    req.requestedTeamId = teamId
+
+    let db = Team.findSingleById(raceId, req.fields)
+
+    db.then(team => {
+        if(team === null)
+            next(new NotFoundError(`Team with id ${teamId} not found`))
+        else {
+            res.team = team
+            next()
+        }            
+    })
+    .catch(err => {
+
+        if('CastError' === err.name && 'ObjectId' === err.kind)
+            next(new NotFoundError(`Team with id ${teamId} not found`))
+        else
+            next(err)
+    })
+})
+
+
+async function getTeams(req, res, next) {
+
+    if(res.team) {
+        res.json(res.team)
+    } else {
+
+        try {
+            let teams = await qh.applyToDb(req, Team.findAll(req.fields))
+            res.paginate(teams, await Team.count())
+        } catch (error) {
+            next(error)
+        }        
     }
-
-    var properties = "_id name users ranking endtime";
-
-    Team.find(query, properties)
-        .populate("users", "firstname lastname races")
-        .then(data => {
-            if(req.params.id){
-                data = data[0];
-            }
-            return res.json(data);
-        })
 }
 
-
 function deleteTeam(req, res, next) {
-
 
     Team.findById(req.params.teamId, function(err, team) {
         return team.remove(function(err) {
@@ -66,9 +88,7 @@ function addUser(req, res, next){
                 res.status(201).json({_id, name, users, ranking, endtime})
             })
                 .catch(reason => {
-                    let error = new Error(reason)
-                    error.status = 500
-                    throw error
+                    next(reason)
                 })
         }
     });
@@ -89,9 +109,7 @@ function removeUser(req, res, next){
                     res.status(201).json({_id, name, users, ranking, endtime})
                 })
                 .catch(reason => {
-                    let error = new Error(reason)
-                    error.status = 500
-                    throw error
+                    next(reason)
                 })
         }
     });
@@ -100,7 +118,7 @@ function removeUser(req, res, next){
 
 // GET /api/teams
 // GET /api/teams/:teamId
-router.get('/:teamId?', getTeams)
+router.get('/:teamId?', ...qh.all(), getTeams)
 
 // POST /api/teams/:teamId/adduser
 router.post('/:teamId/adduser', addUser)

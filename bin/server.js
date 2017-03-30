@@ -6,7 +6,7 @@ const port = process.env.PORT || '3000'
 app.set('port', port)
 
 const server = http.createServer(app)
-require('../data/realtime')(app, server)
+require('../helpers/realtime').create(app, server)
 
 server.listen(port)
 

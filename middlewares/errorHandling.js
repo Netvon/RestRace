@@ -32,7 +32,8 @@ module.exports = function(app) {
 			res.render('error', errObj)
 		}
 
-		app.get('realtime').send('error', errObj)
+		let { realtime } = require('../helpers/realtime')
+		realtime.send('error', errObj)
 
 		return
 	})

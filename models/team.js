@@ -13,6 +13,10 @@ var teamSchema = new mongoose.Schema({
         type: Schema.ObjectId, ref:"User"
     }],
 
+    owner: {
+        type: Schema.ObjectId, ref:"User"
+    },
+
     ranking: [{
         pub:{type: Schema.ObjectId, ref: "Pub"},
         timePassed: Date

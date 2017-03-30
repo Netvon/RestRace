@@ -13,6 +13,13 @@
     "produces": [
         "application/json"
     ],
+    "securityDefinitions": {
+        "JWT": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization"
+        }
+    },
     "paths": {
         "/races/{id}": {
             "get": {
@@ -24,6 +31,12 @@
                         "in": "path",
                         "description": "The ID of the Race to get",
                         "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "The Fields to display. Each field is separated by a comma.",
                         "type": "string"
                     }
                 ],
@@ -52,7 +65,34 @@
         "/races": {
             "get": {
                 "summary": "All Races",
-                "description": "Returns a race\n",
+                "description": "Returns all Races. Results can be paginated when the 'limit' parameter is specified.\n",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "type": "integer",
+                        "maximum": 100,
+                        "description": "The number of items to return per page."
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "type": "integer",
+                        "description": "The number of items to to skip. This should be a multiple of the 'limit' parameter"
+                    },
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "The Fields to display. Each field is separated by a comma.",
+                        "type": "string"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "type": "string",
+                        "description": "The fields to sort the returned items on. Fields can be prefixed with a '-' to sort in reverse order. Each field is separated by a comma."
+                    }
+                ],
                 "tags": [
                     "Races"
                 ],
@@ -60,7 +100,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/Races"
+                            "$ref": "#/definitions/PaginatedRacesResponse"
                         }
                     },
                     "default": {
@@ -195,6 +235,59 @@
                 }
             }
         },
+        "PaginatedResponse": {
+            "type": "object",
+            "properties": {
+                "totalPages": {
+                    "type": "integer"
+                },
+                "currentPage": {
+                    "type": "integer"
+                },
+                "totalItems": {
+                    "type": "integer"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "skip": {
+                    "type": "integer"
+                },
+                "next": {
+                    "type": "string",
+                    "format": "url"
+                },
+                "prev": {
+                    "type": "string",
+                    "format": "url"
+                }
+            },
+            "required": [
+                "totalPages",
+                "currentPage",
+                "totalItems",
+                "limit",
+                "skip"
+            ]
+        },
+        "PaginatedRacesResponse": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/PaginatedResponse"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Race"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
         "NotFoundError": {
             "allOf": [
                 {
@@ -222,6 +315,12 @@
                     "properties": {
                         "message": {
                             "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "status": {
+                            "type": "integer"
                         }
                     }
                 }

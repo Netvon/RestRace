@@ -42,22 +42,5 @@ function getPub(req, res, next){
         })
 }
 
-
-
-
-router.post('/search', (req, res, next) => {
-    searchPubs(req,res)
-})
-
+router.post('/search', searchPubs)
 router.get('/:pubId', getPub)
-
-
-
-
-
-
-
-
-
-
-

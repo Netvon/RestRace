@@ -3,8 +3,7 @@ module.exports = function(app, express = require('express')) {
 
 	router.use((req, res, next) => {
 		req.isApiCall = true
-		req.realtime = app.get('realtime')
-
+		
 		next()
 	})
 	

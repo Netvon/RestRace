@@ -14,6 +14,12 @@ schemes:
 basePath: /api
 produces:
   - application/json
+  
+securityDefinitions:
+  JWT:
+    type: apiKey
+    in: header
+    name: Authorization
 
 paths:
   /races/{id}:
@@ -26,6 +32,10 @@ paths:
           in: path
           description: The ID of the Race to get
           required: true
+          type: string
+        - name: fields
+          in: query
+          description: The Fields to display. Each field is separated by a comma.
           type: string
       tags:
         - Races
@@ -46,13 +56,31 @@ paths:
       summary: All Races
       description: |
         Returns a race
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          minimum: 0
+          default: 0
+        - name: skip
+          in: query
+          type: integer
+          minimum: 0
+          default: 0
+        - name: fields
+          in: query
+          description: The Fields to display. Each field is separated by a comma.
+          type: string
+        - name: sort
+          in: query
+          type: string
       tags:
         - Races
       responses:
         200:
           description: OK
           schema:
-              $ref: '#/definitions/Races'
+              $ref: '#/definitions/PaginatedRacesResponse'
         default:
           description: Unexpected error
           
@@ -142,6 +170,37 @@ definitions:
     properties:
       _id:
         type: string
+        
+  PaginatedResponse:
+    type: object
+    properties:
+      totalPages:
+        type: integer
+      totalItems:
+        type: integer
+      limit:
+        type: integer
+      skip:
+        type: integer
+      next:
+        type: string
+        format: url
+    required:
+      - totalPages
+      - totalItems
+      - limit
+      - skip
+  
+  PaginatedRacesResponse:
+    allOf:
+      - $ref: '#/definitions/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+               $ref: '#/definitions/Race'
+      
           
   NotFoundError:
     allOf:

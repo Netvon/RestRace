@@ -3,7 +3,14 @@
 
 	"Login with Facebook": "Inloggen met Facebook",
 	"Login": "Inloggen",
+	"Logout": "Afmelden",
 	"Register": "Registreren",
 	"Username": "Gebruikersnaam",
-	"Password": "Wachtwoord"
+	"Password": "Wachtwoord",
+	
+	"user": "gebruiker",
+	"admin": "administrator",
+
+	"Welcome": "Welkom",
+	"Welcome to the RestRace Web Interface": "Welkom op de RestRace Web Interface"
 }
