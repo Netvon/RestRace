@@ -41,7 +41,8 @@
     "vue-bulma-card": "^1.0.2",
     "vue-socket.io": "^2.1.0",
     "cookie-parser": "^1.4.3",
-
+    "request": "~2.81.0",
+    "request-promise-native": "~1.0.2",
     "babel-core": "^6.24.0",
     "babel-loader": "^6.4.0",
     "babel-preset-latest": "^6.0.0",
