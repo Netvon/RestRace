@@ -2,7 +2,7 @@ module.exports = function(app, express) {
 	let router = express.Router()
 	let { isLocalAuthenticated, isInRole } = require('../middlewares/auth')
 
-	router.get('/', isLocalAuthenticated, isInRole('admin'), (req, res, next) => {
+	router.get('/', isLocalAuthenticated, (req, res, next) => {
 
 		console.log(req.i18n('Hello, World!'))
 
