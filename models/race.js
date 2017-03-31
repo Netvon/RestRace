@@ -1,6 +1,7 @@
 const	mongoose	= require('mongoose'),
 		slug		= require('mongoose-document-slugs'),
-		Schema		= mongoose.Schema
+		Schema		= mongoose.Schema,
+	{ NotFoundError, ValidationError, UnauthorizedError } = require('./errors')
 
 var GooglePlaces = require('google-places');
 // api key
@@ -155,6 +156,22 @@ raceSchema.methods.checkLocation = function(raceId, teamId, lon, lat) {
                 }
             })
             .catch(err => reject(err))
+    })
+}
+
+raceSchema.methods.getUserTeam = function(raceId, userId) {
+    return new Promise((resolve, reject) => {
+
+        this.teams.forEach(function (team, index) {
+            team.users.forEach(function (user, index) {
+                if(user._id.equals(userId)){
+                    resolve(team)
+
+                }
+            })
+        })
+
+        reject(new NotFoundError(`Team with user ${userId} not found`))
     })
 }
 
