@@ -187,11 +187,21 @@ function checkLocation(req, res, next) {
 
 }
 
+function getUserTeam(req, res, next) {
+
+    res.race.getUserTeam(req.params.raceId, req.user._id)
+        .then(x => res.status(201).json(x))
+        .catch(reason => next(reason))
+
+}
+
 
 
 // GET /api/races
 // GET /api/races/:raceId
 router.get('/:raceId?', ...qh.all(), getRaces)
+
+router.get('/:raceId/getuserteam', isJWTAuthenticated, getUserTeam)
 
 // POST /api/races
 router.post('/', isJWTAuthenticated, addRace)
