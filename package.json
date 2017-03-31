@@ -3,8 +3,12 @@
   "version": "0.0.1",
   "description": "An application for creating and managing Bar Tours",
   "main": "app.js",
+  "engines": {
+    "node": "7.7.4"
+  },
   "scripts": {
     "start": "node bin/server.js",
+    "install": "webpack",
     "test": "mocha --timeout 10000",
     "cover": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec"
   },
@@ -37,9 +41,8 @@
     "vue": "^2.2.4",
     "vue-bulma-card": "^1.0.2",
     "vue-socket.io": "^2.1.0",
-    "cookie-parser": "^1.4.3"
-  },
-  "devDependencies": {
+    "cookie-parser": "^1.4.3",
+
     "babel-core": "^6.24.0",
     "babel-loader": "^6.4.0",
     "babel-preset-latest": "^6.0.0",

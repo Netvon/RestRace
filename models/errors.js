@@ -65,5 +65,6 @@ module.exports = {
 	NotFoundError,
 	InternalServerError,
 	BadRequestError,
-	ValidationError
+	ValidationError,
+	UnauthorizedError
 }

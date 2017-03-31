@@ -25,12 +25,17 @@ module.exports.isJWTAuthenticated = passport.authenticate('jwt', { session: fals
 }*/
 
 module.exports.isInRole = function(role) {
+
+	let { UnauthorizedError } = require('../models/errors')
+
 	return (req, res, next) => {
 		if(req.isAuthenticated()) {
 			if(req.user.roles && req.user.roles.length > 0 && req.user.roles.includes(role))
 				next()
-			else
-				res.status(403).json({ error: { status: 403, message: 'Forbidden' }})
+			else {
+				next(UnauthorizedError())
+			}
+				
 		}
 	}	
 }

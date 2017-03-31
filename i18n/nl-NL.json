@@ -12,5 +12,7 @@
 	"admin": "administrator",
 
 	"Welcome": "Welkom",
-	"Welcome to the RestRace Web Interface": "Welkom op de RestRace Web Interface"
+	"Welcome to the RestRace Web Interface": "Welkom op de RestRace Web Interface",
+
+	"RestRace by Tom van Nimwegen & Luuk Spierings": "RestRace gemaakt door Tom van Nimwegen & Luuk Spierings"
 }
