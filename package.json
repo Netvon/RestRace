@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node bin/server.js",
-    "install": "webpack",
+    "install": "npm install -g webpack mocha instanbul && webpack",
     "test": "mocha --timeout 10000",
     "cover": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec"
   },
