@@ -111,4 +111,5 @@ typings/
 desktop.ini
 
 public/bundle.js
+public/bundle.js.map
 coverage/
