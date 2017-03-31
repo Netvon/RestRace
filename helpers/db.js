@@ -11,7 +11,7 @@ function connectDb(db = 'default', host = 'localhost' ) {
 		let mongoose = require('mongoose')
 
 		mongoose.Promise = Promise
-		mongoose.connect(`mongodb://${host}/${db}`)
+		mongoose.connect(process.env.MONGO_DB || `mongodb://${host}/${db}`)
 			.then(ok => resolve(ok))
 			.catch(err => reject(err))
 	})		
