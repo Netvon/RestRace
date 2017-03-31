@@ -2,7 +2,7 @@
   "name": "rest-race",
   "version": "0.0.1",
   "description": "An application for creating and managing Bar Tours",
-  "main": "app.js",
+  "main": "bin/server.js",
   "engines": {
     "node": "7.7.4"
   },
