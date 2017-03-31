@@ -13,8 +13,8 @@ module.exports = function(app, express) {
 	})
 
 	router.post('/register', passport.authenticate('local-signup', {
-        successRedirect : '/',
-        failureRedirect : '/signup',
+        successRedirect : '/login',
+        failureRedirect : '/login',
         failureFlash : true,
 		successFlash: true
     }))
