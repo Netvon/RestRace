@@ -1,7 +1,7 @@
 const   express     = require('express'),
-<<<<<<< HEAD
 		router      = module.exports = express.Router(),
 		mongoose    = require('mongoose'),
+		request     = require('request-promise-native'),
 		Team        = require('../../models/team'),
 		Race        = require('../../models/race'),
 		Pub         = require('../../models/pub'),
@@ -10,19 +10,6 @@ const   express     = require('express'),
 		{ NotFoundError, ValidationError, UnauthorizedError } = require('../../models/errors'),
 		GooglePlaces = require('google-places'),
 		places = new GooglePlaces('AIzaSyDTnFknpxRhzZHkCegKD0IhjfYWxb-WU14')
-=======
-        router      = module.exports = express.Router(),
-        mongoose    = require('mongoose'),
-        request     = require('request-promise-native'),
-        Team        = require('../../models/team'),
-        Race        = require('../../models/race'),
-        Pub         = require('../../models/pub'),
-        qh          = require('../../middlewares/queryHandlers'),
-        {isJWTAuthenticated} = require('../../middlewares/auth'),
-        { NotFoundError, ValidationError, UnauthorizedError } = require('../../models/errors'),
-        GooglePlaces = require('google-places'),
-        places = new GooglePlaces('AIzaSyDTnFknpxRhzZHkCegKD0IhjfYWxb-WU14')
->>>>>>> 387d4258d03f7d40cfba80ed6efd69fcc696f5dd
 
 router.param('raceId', (req, res, next, raceId) => {
 	qh.projectable(req, res, () => {})
@@ -211,22 +198,21 @@ function getUserTeam(req, res, next) {
 
 function getRankingImage(req, res, next) {
 
-
     Team.findSingleById(req.params.teamId).then(participatingTeam => {
-        var mapsrc = "https://maps.googleapis.com/maps/api/staticmap?maptype=roadmap&size=600x300";
+        let mapsrc = "https://maps.googleapis.com/maps/api/staticmap?maptype=roadmap&size=600x300"
         res.race.pubs.forEach(function (item, index) {
-            var color = "red";
-            if(participatingTeam.ranking){
+            let color = "red"
+            if(participatingTeam.ranking ) {
                 participatingTeam.ranking.forEach(function (rank, index) {
-                    if(item._id == rank.pub._id){
-                        color= "green";
+                    if(item._id == rank.pub._id) {
+                        color= "green"
                     }
                 })
             }
 
-            mapsrc += "&markers=color:"+color+"%7C"+item.lat+","+item.lon;
+            mapsrc += "&markers=color:"+color+"%7C"+item.lat+","+item.lon
         })
-        mapsrc += "&key=AIzaSyDTnFknpxRhzZHkCegKD0IhjfYWxb-WU14";
+        mapsrc += "&key=AIzaSyDTnFknpxRhzZHkCegKD0IhjfYWxb-WU14"
 
 
         var requestSettings = {
@@ -236,8 +222,8 @@ function getRankingImage(req, res, next) {
         };
 
         request(requestSettings).then(function(body) {
-            res.set('Content-Type', 'image/png');
-            res.send(body);
+            res.set('Content-Type', 'image/png')
+            res.send(body)
         })
     })
 
