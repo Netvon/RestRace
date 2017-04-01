@@ -51,6 +51,8 @@
     "uglify-js": "github:mishoo/UglifyJS2#harmony",
     "vue": "^2.2.4",
     "vue-bulma-card": "^1.0.2",
+    "request": "~2.81.0",
+    "request-promise-native": "~1.0.2",
     "vue-loader": "^11.1.4",
     "vue-socket.io": "^2.1.0",
     "vue-template-loader": "^0.2.4",
