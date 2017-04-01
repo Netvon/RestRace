@@ -9,7 +9,5 @@ block precontent
 
 block content
 	div(id='app')= 'Loading application'
-
-block auth
-	a(class= 'nav-item is-tab' href= '/me')= user.local.username
-	a(class= 'nav-item is-tab' href= '/logout')= 'Logout'
+	if user.isInRole('admin')
+		div= 'Hello Admin!'

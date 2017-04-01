@@ -1,129 +1,129 @@
 const   express     = require('express'),
-        router      = module.exports = express.Router(),
-        mongoose    = require('mongoose'),
-        Team        = require('../../models/team'),
-        Race        = require('../../models/race'),
-        Pub         = require('../../models/pub'),
-        qh          = require('../../middlewares/queryHandlers'),
-        {isJWTAuthenticated} = require('../../middlewares/auth'),
-        { NotFoundError, ValidationError, UnauthorizedError } = require('../../models/errors'),
-        GooglePlaces = require('google-places'),
-        places = new GooglePlaces('AIzaSyDTnFknpxRhzZHkCegKD0IhjfYWxb-WU14')
+		router      = module.exports = express.Router(),
+		mongoose    = require('mongoose'),
+		Team        = require('../../models/team'),
+		Race        = require('../../models/race'),
+		Pub         = require('../../models/pub'),
+		qh          = require('../../middlewares/queryHandlers'),
+		{isJWTAuthenticated, combineAuth} = require('../../middlewares/auth'),
+		{ NotFoundError, ValidationError, UnauthorizedError } = require('../../models/errors'),
+		GooglePlaces = require('google-places'),
+		places = new GooglePlaces('AIzaSyDTnFknpxRhzZHkCegKD0IhjfYWxb-WU14')
 
 router.param('raceId', (req, res, next, raceId) => {
-    qh.projectable(req, res, () => {})
+	qh.projectable(req, res, () => {})
 
-    req.requestedRaceId = raceId
+	req.requestedRaceId = raceId
 
-    let { realtime } = require('../../helpers/realtime')
-    realtime.send('race-resolved', `Resolved Race with id '${raceId}'`)
+	let { realtime } = require('../../helpers/realtime')
+	realtime.send('race-resolved', `Resolved Race with id '${raceId}'`)
 
-    let db = Race.findSingleById(raceId)
+	let db = Race.findSingleById(raceId)
 
-    if(req.fields && req.fields.length > 0)
-        db = Race.findSingleById(raceId, req.fields)
+	if(req.fields && req.fields.length > 0)
+		db = Race.findSingleById(raceId, req.fields)
 
-    db.then(race => {
-        if(race === null)
-            next(new NotFoundError(`Race with id ${raceId} not found`))
-        else {
-            res.race = race
-            next()
-        }            
-    })
-    .catch(err => {
+	db.then(race => {
+		if(race === null)
+			next(new NotFoundError(`Race with id ${raceId} not found`))
+		else {
+			res.race = race
+			next()
+		}            
+	})
+	.catch(err => {
 
-        if('CastError' === err.name && 'ObjectId' === err.kind)
-            next(new NotFoundError(`Race with id ${raceId} not found`))
-        else
-            next(err)
-    })
+		if('CastError' === err.name && 'ObjectId' === err.kind)
+			next(new NotFoundError(`Race with id ${raceId} not found`))
+		else
+			next(err)
+	})
 })
 
 
 async function getRaces(req, res, next) {
 
-    if(res.race) {
-        res.json(res.race)
-    } else {
+	if(res.race) {
+		res.json(res.race)
+	} else {
 
-        try {
-            let races = await qh.applyToDb(req, Race.findAll(req.fields))
-            res.paginate(races, await Race.count())
-        } catch (error) {
-            next(error)
-        }        
-    }
+		try {
+			let races = await qh.applyToDb(req, Race.findAll(req.fields))
+			res.paginate(races, await Race.count())
+		} catch (error) {
+			next(error)
+		}        
+	}
 }
 
 
 function addRace(req, res, next) {
 
-    let race = new Race({
-        name: req.body.name,
-        description: req.body.description,
-        starttime: new Date(req.body.starttime),
-        creator: req.user._id
-    })
+	let race = new Race({
+		name: req.body.name,
+		description: req.body.description,
+		starttime: new Date(req.body.starttime),
+		creator: req.user._id
+	})
 
-    if(req.body.tags) {
-        req.body.tags.forEach(tag => race.tags.addToSet(tag))
-    }
+	if(req.body.tags) {
+		req.body.tags.forEach(tag => race.tags.addToSet(tag))
+	}
 
-    race.save()
-        .then(({ _id, name, description, starttime, teams, pubs }) => {
+	race.save()
+		.then(({ _id, name, description, starttime, teams, pubs }) => {
 
-            let { realtime } = require('../../helpers/realtime')
-            realtime.send('race-added', { _id, name, description, starttime })
+			let { realtime } = require('../../helpers/realtime')
+			realtime.send('race-added', { _id, name, description, starttime })
 
-            let addedTeams = []
-            let addedPubs = []
+			let addedTeams = []
+			let addedPubs = []
 
-            if(req.body.teams || req.body.pubs) {
-                let allPromises = []
+			if(req.body.teams || req.body.pubs) {
+				let allPromises = []
 
-                req.body.teams.forEach(teamName => {
-                    allPromises.push(race.addNewTeam(teamName))
-                })
-                req.body.pubs.forEach(pub => {
-                    allPromises.push(race.addNewPub(pub.place_id))
-                })
+				req.body.teams.forEach(teamName => {
+					allPromises.push(race.addNewTeam(teamName))
+				})
+				req.body.pubs.forEach(pub => {
+					allPromises.push(race.addNewPub(pub.place_id))
+				})
 
-                Promise.all(allPromises)
-                    .then(ok => {
+				Promise.all(allPromises)
+					.then(ok => {
 
-                        console.log('allFinished');
+						console.log('allFinished');
 
-                        ok.forEach(t => {
-                            if(t.placeId){
-                                addedPubs.push({_id: t._id, name: t.name})
-                            }
-                            else{
-                                addedTeams.push({_id: t._id, name: t.name})
-                            }
+						ok.forEach(t => {
+							if(t.placeId){
+								addedPubs.push({_id: t._id, name: t.name})
+							}
+							else{
+								addedTeams.push({_id: t._id, name: t.name})
+							}
 
-                        })
+						})
 
-                        res.setHeader('Location', `${req.originalUrl}/${_id}`)
-                        res.status(201).json({_id, name, description, starttime, teams: addedTeams, pubs: addedPubs })
-                    })
-                    .catch(err => {
-                        next(err)
-                    })     
-            }
-            else{
-                res.setHeader('Location', `${req.originalUrl}/${_id}`)
-                res.status(201).json({_id, name, description, starttime, teams })
-            }
+						res.setHeader('Location', `${req.originalUrl}/${_id}`)
+						res.status(201).json({_id, name, description, starttime, teams: addedTeams, pubs: addedPubs })
+					})
+					.catch(err => {
+						next(err)
+					})     
+			}
+			else{
+				res.setHeader('Location', `${req.originalUrl}/${_id}`)
+				res.status(201).json({_id, name, description, starttime, teams })
+			}
 
-        })
-        .catch(reason => {
-            if('ValidationError' === reason.name) {
-                next(new ValidationError(reason.errors, reason.message))
-            } else {
-                next(reason)
-            }
-        })
+		})
+		.catch(reason => {
+			if('ValidationError' === reason.name) {
+				next(new ValidationError(reason.errors, reason.message))
+			} else {
+				next(reason)
+			}
+		})
 
 }
 
@@ -134,64 +134,64 @@ function addRace(req, res, next) {
  */
 function deleteRace(req, res, next) {
 
-    res.race.remove()
-        .then(race => {
-            res.status(200).json({ message: `Race with id ${req.requestedRaceId} removed` })
-        })
-        .catch(reason => next(reason))
+	res.race.remove()
+		.then(race => {
+			res.status(200).json({ message: `Race with id ${req.requestedRaceId} removed` })
+		})
+		.catch(reason => next(reason))
 }
 
 function updateRace(req, res, next) {
 
-    if(req.race.owner.id === req.user.id || req.user.roles.includes('admin')) {
-         Race.update({ _id: req.params.race_Id }, { 
-            name: req.body.name,
-            description: req.body.description,
-            starttime: req.body.starttime,
-            status: req.body.starttime
-        }, { $addToSet: req.body.tags }, { runValidators: true })
-        .then(updated => {
-            let { realtime } = require('../../helpers/realtime')
+	if(req.race.owner.id === req.user.id || req.user.roles.includes('admin')) {
+		 Race.update({ _id: req.params.race_Id }, { 
+			name: req.body.name,
+			description: req.body.description,
+			starttime: req.body.starttime,
+			status: req.body.starttime
+		}, { $addToSet: req.body.tags }, { runValidators: true })
+		.then(updated => {
+			let { realtime } = require('../../helpers/realtime')
 
-            realtime.sendToRoom(`races/${req.params.race_Id}`, 'updated', updated)
+			realtime.sendToRoom(`races/${req.params.race_Id}`, 'updated', updated)
 
-            res.status(201).json({ message: `Race with id ${req.params.race_Id} updated` })
-        })
-        .catch(reason => {
-            if('ValidationError' === reason.name)
-                next(new ValidationError(reason.errors, reason.message))
-            else
-                next(reason)
-        })
-    } else {
-        next(UnauthorizedError('You do not have sufficient rights to edit this Race'))
-    }   
+			res.status(201).json({ message: `Race with id ${req.params.race_Id} updated` })
+		})
+		.catch(reason => {
+			if('ValidationError' === reason.name)
+				next(new ValidationError(reason.errors, reason.message))
+			else
+				next(reason)
+		})
+	} else {
+		next(UnauthorizedError('You do not have sufficient rights to edit this Race'))
+	}   
 
 }
 
 
 function addTeam(req, res, next){
 
-    res.race.addNewTeam(req.body.name)
-        .then(x => res.status(201).json(x))
-        .catch(reason => next(reason))
+	res.race.addNewTeam(req.body.name)
+		.then(x => res.status(201).json(x))
+		.catch(reason => next(reason))
 
 }
 
 
 function checkLocation(req, res, next) {
 
-    res.race.checkLocation(req.params.raceId, req.body.teamId, req.body.lon, req.body.lat)
-        .then(x => res.status(201).json(x))
-        .catch(reason => next(reason))
+	res.race.checkLocation(req.params.raceId, req.body.teamId, req.body.lon, req.body.lat)
+		.then(x => res.status(201).json(x))
+		.catch(reason => next(reason))
 
 }
 
 function getUserTeam(req, res, next) {
 
-    res.race.getUserTeam(req.params.raceId, req.user._id)
-        .then(x => res.status(201).json(x))
-        .catch(reason => next(reason))
+	res.race.getUserTeam(req.params.raceId, req.user._id)
+		.then(x => res.status(201).json(x))
+		.catch(reason => next(reason))
 
 }
 
@@ -199,7 +199,7 @@ function getUserTeam(req, res, next) {
 
 // GET /api/races
 // GET /api/races/:raceId
-router.get('/:raceId?', ...qh.all(), getRaces)
+router.get('/:raceId?', combineAuth, ...qh.all(), getRaces)
 
 router.get('/:raceId/getuserteam', isJWTAuthenticated, getUserTeam)
 

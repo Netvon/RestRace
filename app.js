@@ -9,6 +9,7 @@ const 	express 	= require('express'),
 		useErrors	= require('./middlewares/errorHandling'),
 		useI18n		= require('./middlewares/i18n'),
 		{useAuth}	= require('./middlewares/auth'),
+		usePugExtensions = require('./middlewares/pugExtensions'),
 		cors		= require('cors')
 
 // connect data layer
@@ -26,19 +27,7 @@ app.use(cors())
 
 useI18n(app, path.join(__dirname, 'i18n'))
 useAuth(app)
-
-app.use((req, res, next) => {
-
-	res.renderWithDefaults = (view, scope = {}) => {
-		scope.notifications = req.flash()
-		scope.i18n = req.i18n
-		scope.user = req.user
-
-		res.render(view, scope)
-	}
-
-	next()
-})
+usePugExtensions(app)
 
 // setup routes middleware
 app.use('/', require('./routes/auth')(app, express), require('./routes/index')(app, express))

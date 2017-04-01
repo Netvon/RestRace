@@ -79,6 +79,8 @@ module.exports = function(app, express) {
 			} else {
 				next(AuthentificationError('Password did not match'))
 			}
+		} else {
+			next(AuthentificationError('No Password or Username present'))
 		}
 	})
 

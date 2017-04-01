@@ -3,9 +3,6 @@ module.exports = function(app, express) {
 	let { isLocalAuthenticated, isInRole } = require('../middlewares/auth')
 
 	router.get('/', isLocalAuthenticated, (req, res, next) => {
-
-		console.log(req.i18n('Hello, World!'))
-
 		res.renderWithDefaults('index')
 	})
 
@@ -15,6 +12,10 @@ module.exports = function(app, express) {
 
 	router.get('/admin', isLocalAuthenticated, isInRole('admin'), (req, res, next) => { 
 		res.renderWithDefaults('admin/index')
+	})
+
+	router.get('/admin/users', isLocalAuthenticated, isInRole('admin'), (req, res, next) => { 
+		res.renderWithDefaults('admin/users')
 	})
 
 	return router

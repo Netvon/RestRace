@@ -5,7 +5,7 @@
  * @param {string} [host='localhost'] 
  * @returns {Promise}
  */
-function connectDb(db = 'default', host = 'localhost' ) {
+function connectDb(db, host = 'localhost' ) {
 
 	return new Promise((resolve, reject) => {
 		let mongoose = require('mongoose')

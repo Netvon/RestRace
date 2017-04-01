@@ -9,8 +9,8 @@
   "scripts": {
     "start": "node bin/server.js",
     "install": "node_modules/.bin/webpack",
-    "test": "node_modules/.bin/_mocha --timeout 10000",
-    "cover": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- -R spec"
+    "test": "mocha --timeout 10000",
+    "cover": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec"
   },
   "dependencies": {
     "accept-language": "^3.0.15",

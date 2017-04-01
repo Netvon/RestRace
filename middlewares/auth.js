@@ -8,14 +8,26 @@ module.exports.useAuth = function(app = require('express')()) {
 
 }
 
-module.exports.isLocalAuthenticated = (req, res, next) => {
-	if(req.isAuthenticated())
-		next()
-	else
-		res.redirect('/login')
+module.exports.combineAuth = (req, res, next) => {
+	let type = req.accepts(['html', 'json'])
+
+	if(type === 'json') {
+		passport.authenticate('jwt', { session: false })(req, res, next)
+	} else if(type === 'html') {
+		module.exports.isLocalAuthenticated(req, res, next)
+	}
 }
 
-module.exports.isJWTAuthenticated = passport.authenticate('jwt', { session: false })/*(req, res, next) => {
+module.exports.isLocalAuthenticated = (req, res, next) => {
+	if(req.isAuthenticated()) {
+		next()
+	}
+	else {
+		res.redirect('/login')
+	}		
+}
+
+module.exports.isJWTAuthenticated = passport.authenticate('jwt', { session: false, failureFlash: true })/*(req, res, next) => {
 	if(req.isAuthenticated())
 		next()
 	else {
@@ -33,7 +45,7 @@ module.exports.isInRole = function(role) {
 			if(req.user.roles && req.user.roles.length > 0 && req.user.roles.includes(role))
 				next()
 			else {
-				next(UnauthorizedError())
+				next(UnauthorizedError('You do not have sufficient '))
 			}
 				
 		}
@@ -121,8 +133,12 @@ function useLocal(app) {
     })
 
     passport.deserializeUser(async (id, done) => {
-        let user = await User.findById(id)
-		done(null, user)
+		try {
+			let user = await User.findById(id)
+			done(null, user)
+		} catch(err) {
+			done(null, user)
+		}
     })
 
 	
