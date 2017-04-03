@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios' 
 
 export async function createApiCall(url, method, data) {
 	let tokenResponse = await axios.post('/auth/token')
