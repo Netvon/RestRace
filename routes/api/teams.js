@@ -2,7 +2,8 @@ const express = require('express'),
     router	= module.exports = express.Router(),
     mongoose = require('mongoose'),
     qh = require('../../middlewares/queryHandlers'),
-    { NotFoundError, ValidationError } = require('../../models/errors'),
+    { NotFoundError, ValidationError, UnauthorizedError } = require('../../models/errors'),
+    { isJWTAuthenticated } = require('../../middlewares/auth'),
     Team = require('../../models/team'),
     User = require('../../models/user'),
     Race = require('../../models/race')
@@ -116,15 +117,40 @@ function removeUser(req, res, next){
 
 }
 
+function updateTeam(req, res, next) {
+    if(req.user.roles.includes('admin') || req.user.id  === res.team.owner.id ) {
+
+		res.team.updateWith(req.body)
+		.then(updated => {
+			let { realtime } = require('../../helpers/realtime')
+
+			realtime.sendToRoom(`teams/${updated.id}`, 'updated', updated)
+
+			res.status(201).json({ message: `Team with id ${updated.id} updated` })
+		})
+		.catch(reason => {
+			if('ValidationError' === reason.name)
+				next(new ValidationError(reason.errors, reason.message))
+			else
+				next(reason)
+		})
+	} else {
+		next(UnauthorizedError('You do not have sufficient rights to edit this Team'))
+	}   
+}
+
 // GET /api/teams
 // GET /api/teams/:teamId
 router.get('/:teamId?', ...qh.all(), getTeams)
 
-// POST /api/teams/:teamId/adduser
-router.post('/:teamId/adduser', addUser)
+// PUT /api/teams/:teamId
+router.put('/:teamId', isJWTAuthenticated, updateTeam)
 
 // POST /api/teams/:teamId/adduser
-router.post('/:teamId/removeuser', removeUser)
+router.post('/:teamId/adduser', isJWTAuthenticated, addUser)
+
+// POST /api/teams/:teamId/adduser
+router.post('/:teamId/removeuser', isJWTAuthenticated, removeUser)
 
 // DELETE /api/teams/:teamId
-router.delete('/:teamId', deleteTeam)
+router.delete('/:teamId', isJWTAuthenticated, deleteTeam)

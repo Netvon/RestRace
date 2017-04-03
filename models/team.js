@@ -69,6 +69,17 @@ teamSchema.statics.findSingleById = function(_id) {
                .populate(defaultPopulation)
 }
 
+teamSchema.methods.updateWith = function(object) {
+	
+    if(object.name && object.name !== "" && object.name !== this.name)
+        this.name = object.name
+
+    if(object.endtime && object.endtime !== "" && object.endtime !== this.endtime)
+        this.endtime = object.endtime
+
+	return this.save()
+}
+
 teamSchema.methods.addUser = function(userId) {
     this.users.push(userId)
 
