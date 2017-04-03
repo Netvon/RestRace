@@ -213,13 +213,18 @@ function useJwt(app) {
 	
 	let strategy = new JwtStrategy(jwtOptions, async function(jwt_payload, next) {
 
-		let user = await User.findOne({ _id: jwt_payload.sub })
+		try {
+			let user = await User.findOne({ _id: jwt_payload.sub })
 
-		if (user) {
-			next(null, user);
-		} else {
-			next(null, false);
+			if (user) {
+				next(null, user);
+			} else {
+				next(null, false);
+			}
+		} catch (error) {
+			next(error, null, error.message)
 		}
+		
 	})
 
 	passport.use(strategy)

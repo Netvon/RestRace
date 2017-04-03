@@ -40,7 +40,7 @@ function ValidationError(validationErrors, message = 'Validation Error', status 
 	return error
 }
 
-function AuthentificationError(reason, message = 'Authentification failed', status = 401) {
+function AuthentificationError(reason, message = 'Authentification failed', status = 422) {
 	let error = new Error(message)
 	error.name = 'AuthentificationError'
 	error.status = status
@@ -50,7 +50,7 @@ function AuthentificationError(reason, message = 'Authentification failed', stat
 	return error
 }
 
-function UnauthorizedError(reason, message = 'Unauthorized', status = 403) {
+function UnauthorizedError(reason, message = 'Unauthorized', status = 401) {
 	let error = new Error(message)
 	error.name = 'UnauthorizedError'
 	error.status = status

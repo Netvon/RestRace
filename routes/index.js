@@ -10,17 +10,5 @@ module.exports = function(app, express) {
 		res.send("You're a cool guy, huh?")
 	})
 
-	// router.get('/admin', isLocalAuthenticated, isInRole('admin'), (req, res, next) => { 
-	// 	res.renderWithDefaults('admin/index')
-	// })
-
-	// router.get('/admin/users', isLocalAuthenticated, isInRole('admin'), (req, res, next) => { 
-	// 	res.renderWithDefaults('admin/users/index')
-	// })
-
-	// router.get('/admin/users/create', isLocalAuthenticated, isInRole('admin'), (req, res, next) => {
-	// 	res.renderWithDefaults('admin/users')
-	// })
-
 	return router
 }
