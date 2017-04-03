@@ -157,9 +157,9 @@ function updateRace(req, res, next) {
 		.then(updated => {
 			let { realtime } = require('../../helpers/realtime')
 
-			realtime.sendToRoom(`races/${updated.id}`, 'updated', updated)
+			realtime.send('updated', updated)
 
-			res.status(201).json({ message: `Race with id ${updated.id} updated` })
+			res.status(200).json({ message: `Race with id ${updated.id} updated` })
 		})
 		.catch(reason => {
 			if('ValidationError' === reason.name)

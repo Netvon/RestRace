@@ -81,10 +81,10 @@ function deleteUser(req, res, next) {
 }
 
 function updateUser(req, res, next) {
-    
+
     res.dbUser.updateWith(req.body)
         .then(({_id, firstname, lastname }) => {
-            res.status(201).json({_id, firstname, lastname })
+            res.status(200).json({_id, firstname, lastname })
         })
         .catch(reason => {
             next(reason)
@@ -102,7 +102,7 @@ function searchUsers(req, res) {
         } else{
             res.setHeader('Location', req.originalUrl + '/' + req.params.searchText)
             // res.status(201).json({_id: users[0]._id, firstname: users[0].firstname, lastname: users[0].lastname })
-            res.status(201).json(users);
+            res.status(200).json(users);
         }
 
     });

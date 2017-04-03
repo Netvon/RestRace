@@ -14,7 +14,7 @@ function searchPubs(req, res) {
 
     places.autocomplete({input: req.body.searchText, types: "establishment"}, function(err, response) {
 
-        res.status(201).json(response.predictions);
+        res.status(200).json(response.predictions);
 
     });
 

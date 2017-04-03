@@ -55,12 +55,12 @@ function deleteTeam(req, res, next) {
         return team.remove(function(err) {
             if(!err) {
                 Race.update({}, {$pull: {teams: team._id}}, function (err, numberAffected) {
-                        console.log(numberAffected);
+                    if(err) next(err)
                 })
             } else {
-                console.log(err);
+                next(err)
             }
-            res.status(201).json({return:"return"})
+            res.status(200).json({ message: 'Team removed' })
         });
     });
 
@@ -78,16 +78,15 @@ function deleteTeam(req, res, next) {
 function addUser(req, res, next){
 
     User.findById(req.body.userId, function (err, response){
-        if(err){
-            res.json({message: "Error in finding user with id " + req.body.userId});
+        if(err) {
+            next(NotFoundError('Error in finding user with id ' + req.body.userId))
         }
-        else{
-            Team.findByIdAndUpdate(req.params.teamId, {"$push": {"users": response._id}}, {new: true})
+        else {
+            Team.findByIdAndUpdate(req.params.teamId, {"$push": {"users": response._id}}, { new: true })
                 .populate("users", "local.username races")
                 .then(({_id, name, users, ranking, endtime }) => {
-                res.setHeader('Location', req.originalUrl + '/' + _id)
-                res.status(201).json({_id, name, users, ranking, endtime})
-            })
+                    res.status(200).json({_id, name, users, ranking, endtime})
+                })
                 .catch(reason => {
                     next(reason)
                 })
@@ -98,16 +97,15 @@ function addUser(req, res, next){
 
 function removeUser(req, res, next){
 
-    User.findById(req.body.userId, function (err, response){
-        if(err){
-            res.json({message: "Error in finding user with id " + req.body.userId});
+    User.findById(req.body.userId, function (err, response) {
+        if(err) {
+            next(NotFoundError('Error in finding user with id ' + req.body.userId))
         }
-        else{
-            Team.findByIdAndUpdate(req.params.teamId, {"$pull": {"users": response._id}}, {new:true})
+        else {
+            Team.findByIdAndUpdate(req.params.teamId, {"$pull": {"users": response._id}}, { new:true })
                 .populate("users", "local.username races")
                 .then(({_id, name, users, ranking, endtime }) => {
-                    res.setHeader('Location', req.originalUrl + '/' + _id)
-                    res.status(201).json({_id, name, users, ranking, endtime})
+                    res.status(200).json({_id, name, users, ranking, endtime})
                 })
                 .catch(reason => {
                     next(reason)
@@ -126,7 +124,7 @@ function updateTeam(req, res, next) {
 
 			realtime.sendToRoom(`teams/${updated.id}`, 'updated', updated)
 
-			res.status(201).json({ message: `Team with id ${updated.id} updated` })
+			res.status(200).json({ message: `Team with id ${updated.id} updated` })
 		})
 		.catch(reason => {
 			if('ValidationError' === reason.name)
