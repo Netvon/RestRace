@@ -8,6 +8,7 @@
 					<th>updatedAt</th>
 					<th>createdAt</th>
 					<th>Edit</th>
+					<th>Delete</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -17,6 +18,7 @@
 					<td>{{ user.updatedAt }}</td>
 					<td>{{ user.createdAt }}</td>
 					<td><a :href="'/admin/users/' + user._id + '/edit'">Edit</a></td>
+					<td><a @click="deleteUser(user._id)">Delete</a></td>
 				</tr>
 			</tbody>
 		</table>
@@ -61,6 +63,14 @@ export default {
 			}
 
 			this.isLoading = false
+		},
+
+		async deleteUser(userId) {
+			let response = await api.createApiCall('/api/users/' + userId, 'delete')
+
+			if(response.status === 200) {
+				window.location.href = window.location.origin + '/admin/users'
+			}
 		}
 	}
 	

@@ -108,17 +108,6 @@ function updateUser(req, res, next) {
 
 }
 
-async function updateSelf(req, res, next) {
-
-    try {
-        res.json(await req.user.update(req.body))
-    } catch (error) {
-        next(error)
-    }
-    
-
-}
-
 function searchUsers(req, res) {
 
     var re = new RegExp('.*'+req.params.searchText+'.*', "i");
@@ -151,4 +140,3 @@ router.delete('/:userId', deleteUser)
 
 // PUT /api/users/:userId
 router.put('/:userId', isJWTAuthenticated, isInRole('admin'), updateUser)
-router.put('/', isJWTAuthenticated, updateSelf)
