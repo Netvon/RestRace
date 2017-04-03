@@ -111,4 +111,19 @@ userSchema.methods.isInRole = function(role) {
     return this.roles.includes(role)
 }
 
+userSchema.methods.updateWith = function(object) {
+    if(object.username && object.username !== "" && object.username !== this.local.username)
+        this.local.username = object.username
+    if(object.password && object.password !== "")
+        this.local.password = object.password
+    if(object.roles && Array.isArray(object.roles))
+        object.roles.forEach(r => this.roles.addToSet(r))
+    if(object.firstname && object.firstname !== "" && object.firstname !== this.firstname)
+        this.firstname = object.firstname
+    if(object.lastname && object.lastname !== "" && object.lastname !== this.lastname)
+        this.lastname = object.lastname
+
+    return this.save()
+}
+
 module.exports = mongoose.model('User', userSchema)

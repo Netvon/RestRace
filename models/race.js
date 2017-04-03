@@ -77,20 +77,24 @@ raceSchema.statics.findSingle = function(params, projection = defaultProjection,
 	return this.findOne(params, projection).populate(populateOptions)
 }
 
-raceSchema.statics.updateFromObject = function(id, object) {
-	let setTags = null
+raceSchema.methods.updateWith = function(object) {
+	
+    if(object.name && object.name !== "" && object.name !== this.name)
+        this.name = object.name
 
-	if(object.tags && typeof object.tags === 'array') {
-		setTags = { $addToSet: object.tags }
-	}
+    if(object.status && object.status !== "" && object.status !== this.status)
+        this.status = object.status
 
-	delete object._id
-	delete object.pubs
-	delete object.teams
-	delete object.owner
+    if(object.tags && Array.isArray(object.tags))
+        object.tags.forEach(r => this.tags.addToSet(r))
 
+    if(object.starttime && object.starttime !== "" && object.starttime !== this.starttime)
+        this.starttime = object.starttime
 
-	return this.findOneAndUpdate({ _id: id }, object, setTags, { runValidators: true })
+    if(object.description && object.description !== "" && object.description !== this.description)
+        this.description = object.description
+
+	return this.save()
 }
 
 raceSchema.methods.addNewTeam = function(teamName) {

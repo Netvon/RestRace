@@ -81,22 +81,8 @@ function deleteUser(req, res, next) {
 }
 
 function updateUser(req, res, next) {
-
-
-    if(req.body.username && req.body.username !== "" && req.body.username !== res.dbUser.local.username)
-        res.dbUser.local.username = req.body.username
-    if(req.body.password && req.body.password !== "")
-        res.dbUser.local.password = req.body.password
-    if(req.body.roles)
-        res.dbUser.roles = req.body.roles
-    if(req.body.firstname && req.body.firstname !== "" && req.body.firstname !== res.dbUser.firstname)
-        res.dbUser.firstname = req.body.firstname
-    if(req.body.lastname && req.body.lastname !== "" && req.body.lastname !== res.dbUser.lastname)
-        res.dbUser.lastname = req.body.lastname
-        
     
-
-    res.dbUser.save()
+    res.dbUser.updateWith(req.body)
         .then(({_id, firstname, lastname }) => {
             res.status(201).json({_id, firstname, lastname })
         })

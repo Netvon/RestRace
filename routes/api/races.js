@@ -144,19 +144,22 @@ function deleteRace(req, res, next) {
 
 function updateRace(req, res, next) {
 
-	if(req.race.owner.id === req.user.id || req.user.roles.includes('admin')) {
-		 Race.update({ _id: req.params.race_Id }, { 
-			name: req.body.name,
-			description: req.body.description,
-			starttime: req.body.starttime,
-			status: req.body.starttime
-		}, { $addToSet: req.body.tags }, { runValidators: true })
+	if(req.user.roles.includes('admin') || req.user.id  === res.race.owner.id ) {
+
+		res.race.updateWith(req.body)
+
+		//  Race.update({ _id: req.params.race_Id }, { 
+		// 	name: req.body.name,
+		// 	description: req.body.description,
+		// 	starttime: req.body.starttime,
+		// 	status: req.body.starttime
+		// }, { $addToSet: req.body.tags }, { runValidators: true })
 		.then(updated => {
 			let { realtime } = require('../../helpers/realtime')
 
-			realtime.sendToRoom(`races/${req.params.race_Id}`, 'updated', updated)
+			realtime.sendToRoom(`races/${updated.id}`, 'updated', updated)
 
-			res.status(201).json({ message: `Race with id ${req.params.race_Id} updated` })
+			res.status(201).json({ message: `Race with id ${updated.id} updated` })
 		})
 		.catch(reason => {
 			if('ValidationError' === reason.name)
