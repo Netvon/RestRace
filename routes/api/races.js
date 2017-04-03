@@ -204,7 +204,7 @@ function getRankingImage(req, res, next) {
             let color = "red"
             if(participatingTeam.ranking ) {
                 participatingTeam.ranking.forEach(function (rank, index) {
-                    if(item._id == rank.pub._id) {
+                    if(item._id.equals(rank.pub._id)) {
                         color= "green"
                     }
                 })
