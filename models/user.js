@@ -25,12 +25,12 @@ var userSchema = new mongoose.Schema({
         }
     },
 
-    roles: {
-		type: [String],
+    roles: [{
+		type: String,
 		default: ['user'],
         lowercase: true,
         enum: ['user', 'admin']
-	},
+	}],
 
     firstname: {
         type:String
@@ -49,8 +49,11 @@ var userSchema = new mongoose.Schema({
 userSchema.plugin(mongooseHidden, { hidden: { _id: false } })
 
 userSchema.pre('save', function(next) {
-    if(this.local.password)
+    if(this.local.password && this.isModified('local.password'))
         this.local.password = bcrypt.hashSync(this.local.password, 10)
+
+    if(!this.isInRole('user'))
+        this.roles.push('user')
     
     next()
 })
@@ -69,15 +72,20 @@ userSchema.statics.findSingleById = function(_id, projection = defaultProjection
 }
 
 userSchema.virtual('fullName').get(function() {
-    return `${this.firstname} ${this.lastname}`
+    if(!this.firstname && !this.lastname)
+        return undefined
+
+    return `${this.firstname || ''} ${this.lastname || ''}`
 })
 
 userSchema.virtual('hasFacebook').get(function() {
     return this.social.facebookId != null
 })
 
-userSchema.methods.removeFacebook = async function() {
-    await this.update({ 'social.facebookId': null })
+userSchema.methods.removeFacebook = function() {
+    this.social.facebookId = null
+
+    return this.save()
 }
 
 userSchema.statics.validateUsernamePassword = async function(username, password) {

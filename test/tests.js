@@ -2,7 +2,6 @@ process.env.FACEBOOK_CLIENT_ID = '1954358709511840'
 process.env.FACEBOOK_CLIENT_SECRET = '6d987d5829ec9620655894d2c86f1f32'
 
 let mongoose = require('mongoose')
-let Race = require('../models/race')
 
 let chai = require('chai')
 let chaiHttp = require('chai-http')
@@ -11,6 +10,22 @@ let should = chai.should()
 let expect = chai.expect
 
 chai.use(chaiHttp)
+
+describe('Model Tests', () => {
+	describe('User', () => {
+		it('It should only allow \'admin\' and \'user\' roles', done => {
+			let User = require('../models/user')
+
+			let user = new User()
+			user.roles = ['lol', 'hallo']
+
+			let errors = user.validateSync('roles')
+			console.log(errors)
+
+			done()
+		})
+	})
+})
 
 describe('Errors', () => {
 	describe('404', () => {

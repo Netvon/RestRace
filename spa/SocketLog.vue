@@ -1,5 +1,5 @@
 <template>
-	<div id="app">
+	<div class="socket-log">
 		<div class="log-list">
 			<div v-for="message in messages">
 				<div class="message is-info">
@@ -23,7 +23,8 @@
 import axios from 'axios'
 
 export default {
-	name: 'app',
+	name: 'socket-log',
+
 	data() {
 		return {
 			messages: []
@@ -51,16 +52,6 @@ export default {
 </script>
 
 <style lang="scss">
-
-.log-list {
-    margin: 0;
-    padding: 0;
-}
-
-.log-item {
-    font-family: monospace;
-}
-
 .main-section {
 	flex-grow: 1;
 }
@@ -74,5 +65,15 @@ body {
     min-height: 100vh;
 	display: flex;
 	flex-direction: column;
+}
+
+
+.log-list {
+    margin: 0;
+    padding: 0;
+}
+
+.log-item {
+    font-family: monospace;
 }
 </style>

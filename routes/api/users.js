@@ -43,26 +43,28 @@ async function getUsers(req, res, next) {
     }
 }
 
-function addUser(req, res, next) {
+async function addUser(req, res, next) {
 
     let user = new User({
         firstname: req.body.firstname,
         lastname: req.body.lastname,
-        
+
         local: {
             username: req.body.username,
             password: req.body.password
-        }
+        },
+
+        roles: req.body.roles
         
     })
 
-    user.save().then(newuser => {
+    try {
+        let newuser = await user.save()
         res.setHeader('Location', req.originalUrl + '/' + newuser._id)
-        res.status(201).json(newuser)
-    }).catch(reason => {
+        res.status(201).json(newuser)        
+    } catch (reason) {
         next(reason)
-    })
-
+    }
 }
 
 
@@ -80,7 +82,23 @@ function deleteUser(req, res, next) {
 
 function updateUser(req, res, next) {
 
-    User.findByIdAndUpdate(req.params.userId, req.body)
+    let update = {}
+
+    if(req.body.username)
+        update.local = { username: req.body.username }
+    if(req.body.password)
+        if(!update.local)
+            update.local = { password: req.body.password }
+        else
+            update.local.password = req.body.password
+    if(req.body.roles)
+        update.roles = req.body.roles
+    if(req.body.firstname)
+        update.firstname = req.body.firstname
+    if(req.body.lastname)
+        update.lastname = req.body.lastname
+
+    User.findByIdAndUpdate(req.params.userId, update)
         .then(({_id, firstname, lastname }) => {
             res.status(201).json({_id, firstname, lastname })
         })

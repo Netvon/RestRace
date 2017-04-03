@@ -1,0 +1,41 @@
+extends ../../layout
+
+block content
+	div(class= 'card')
+		div(class= 'card-header')
+			p(class= 'card-header-title is-2')= 'Create User'
+		div(class= 'card-content' id= 'app')
+			form(method= 'POST' action= '/api/users' @submit.prevent= 'submitForm' data-after='/admin/users' data-method='post')
+				div(class= 'field')
+					label(class= 'label' name= 'username')= 'Username'
+					p(class= 'control')
+						input(class= 'input' type= 'text' name= 'username' required)
+
+				div(class= 'field')
+					label(class= 'label' name= 'password')= 'Password'
+					p(class= 'control')
+						input(class= 'input' type= 'text' name= 'password' required)
+
+				div(class= 'field')
+					label(class= 'label' name= 'firstname')= 'Firstname'
+					p(class= 'control')
+						input(class= 'input' type= 'text' name= 'firstname')
+				
+				div(class= 'field')
+					label(class= 'label' name= 'lastname')= 'Lastname'
+					p(class= 'control')
+						input(class= 'input' type= 'text' name= 'lastname')
+				
+				div(class= 'field is-grouped')
+					p(class= 'control')
+						label(class= 'checkbox')
+							input(type= 'checkbox' name= 'roles[]' value= 'user')
+							= 'User'
+					p(class= 'control')
+						label(class= 'checkbox')
+							input(type= 'checkbox' name= 'roles[]' value= 'admin')
+							= 'Admin'
+
+				div(class= 'field')
+					p(class= 'control')
+						input(type= 'submit' class= 'button is-primary' value= 'Create')

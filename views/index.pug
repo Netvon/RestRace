@@ -8,6 +8,5 @@ block precontent
 				h2(class= 'subtitle')= i18n('Welcome to the RestRace Web Interface')
 
 block content
-	div(id='app')= 'Loading application'
 	if user.isInRole('admin')
 		div= 'Hello Admin!'

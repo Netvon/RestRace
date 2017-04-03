@@ -1,0 +1,41 @@
+extends ../../layout
+
+block content
+	div(class= 'card')
+		div(class= 'card-header')
+			p(class= 'card-header-title is-2')= 'Edit User'
+		div(class= 'card-content' id= 'app' data-userId= userId)
+			form(method= 'PUT' action= '/api/users/' + userId @submit.prevent= 'submitForm' data-after='/admin/users' data-method='put')
+				div(class= 'field')
+					label(class= 'label' name= 'username')= 'Username'
+					p(class= 'control')
+						input(class= 'input' type= 'text' name= 'username' required v-model='user.local.username')
+
+				div(class= 'field')
+					label(class= 'label' name= 'password')= 'New password'
+					p(class= 'control')
+						input(class= 'input' type= 'text' name= 'password' required)
+
+				div(class= 'field')
+					label(class= 'label' name= 'firstname')= 'Firstname'
+					p(class= 'control')
+						input(class= 'input' type= 'text' name= 'firstname' v-model='user.firstname')
+				
+				div(class= 'field')
+					label(class= 'label' name= 'lastname')= 'Lastname'
+					p(class= 'control')
+						input(class= 'input' type= 'text' name= 'lastname' v-model='user.lastname')
+				
+				div(class= 'field is-grouped')
+					p(class= 'control')
+						label(class= 'checkbox')
+							input(type= 'checkbox' name= 'roles[]' value= 'user' v-model='user.roles')
+							= 'User'
+					p(class= 'control')
+						label(class= 'checkbox')
+							input(type= 'checkbox' name= 'roles[]' value= 'admin' v-model='user.roles')
+							= 'Admin'
+
+				div(class= 'field')
+					p(class= 'control')
+						input(type= 'submit' class= 'button is-primary' value= 'Update')

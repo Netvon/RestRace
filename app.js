@@ -32,6 +32,7 @@ usePugExtensions(app)
 // setup routes middleware
 app.use('/', require('./routes/auth')(app, express), require('./routes/index')(app, express))
 app.use('/api', require('./routes/api')(app, express))
+app.use('/admin', require('./routes/admin')(app, express))
 
 useApiDocs(app)
 useErrors(app)

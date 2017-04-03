@@ -24,13 +24,8 @@ var teamSchema = new mongoose.Schema({
 
     endtime: {
         type: Date,
-    },
-
-    meta: {
-        createdOn: { type: Date, default: Date.now },
-        isEnabled: { type: Boolean, default: true }
     }
-})
+}, { timestamps: true })
 
 let defaultTeamNames = [
     'Bavaria',
@@ -65,12 +60,20 @@ teamSchema.statics.findSingleById = function(_id) {
                .populate("users", "local.username races")
 }
 
-teamSchema.methods.removeUser = function() {
+teamSchema.methods.addUser = function(userId) {
+    this.users.push(userId)
 
+    return this.save()
 }
 
-teamSchema.methods.addUser = function() {
+teamSchema.methods.removeUser = function(userId) {
+    let index = this.users.indexOf(userId)
 
+    if(index >= 0) {
+        this.users.splice(index, 1)       
+    }
+
+    return this.save()
 }
 
 teamSchema.statics.createWithNameOrDefaultName = function(teamName = null) {

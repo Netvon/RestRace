@@ -54,33 +54,37 @@ module.exports = function(app, express) {
 			secretOrKey: process.env.JWT_SECRET || 'default'
 		}
 
-		if(req.isAuthenticated())
-			console.log('psst, i also work with local :)')
-
-		if(req.body.username && req.body.password) {
+		if(req.isAuthenticated()) {
+			// console.log('psst, i also work with local :)')
+			createAndReturnToken(req.user, req, res)
+		}
+		else if(req.body.username && req.body.password) {
 			let args = await User.validateUsernamePassword(req.body.username, req.body.password)
 
 			if(args === false) {
 				next(AuthentificationError('User not Found'))
 			}
 			else if(args.valid) {
-
-				var payload = { 
-					sub: args.user.id,
-					iss: req.protocol + '://' + req.get('host')
-				}
-
-				var token = jwt.sign(payload, jwtOptions.secretOrKey, {
-					expiresIn: '1d'
-				})
-
-				res.json({ message: "ok", token: token })
+				createAndReturnToken(args.user, req, res)
 
 			} else {
 				next(AuthentificationError('Password did not match'))
 			}
 		} else {
 			next(AuthentificationError('No Password or Username present'))
+		}
+
+		function createAndReturnToken(user, req, res) {
+			let payload = { 
+				sub: user.id,
+				iss: req.protocol + '://' + req.get('host')
+			}
+
+			let token = jwt.sign(payload, jwtOptions.secretOrKey, {
+				expiresIn: '1d'
+			})
+
+			res.json({ message: "ok", token: token })
 		}
 	})
 

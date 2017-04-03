@@ -94,15 +94,25 @@ raceSchema.statics.updateFromObject = function(id, object) {
 }
 
 raceSchema.methods.addNewTeam = function(teamName) {
-	return new Promise((resolve, reject) => {
-		require('./team').createWithNameOrDefaultName(teamName)
-		.then(newTeam => {
-			this.update({ $push: { 'teams': newTeam._id } })
-				.then(ok => resolve(newTeam))
-				.catch(err => reject(err))
-		})
-		.catch(err => reject(err))
-	})
+
+    let Team = require('./team')
+
+    return Team.createWithNameOrDefaultName(teamName)
+        .then(newTeam => {
+            this.teams.push(newTeam._id)
+
+            return this.save()
+        })
+
+	// return new Promise((resolve, reject) => {
+	// 	require('./team').createWithNameOrDefaultName(teamName)
+	// 	.then(newTeam => {
+	// 		this.update({ $push: { 'teams': newTeam._id } })
+	// 			.then(ok => resolve(newTeam))
+	// 			.catch(err => reject(err))
+	// 	})
+	// 	.catch(err => reject(err))
+	// })
 }
 
 raceSchema.methods.addNewPub = function(placeId) {
