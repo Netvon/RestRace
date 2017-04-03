@@ -82,23 +82,21 @@ function deleteUser(req, res, next) {
 
 function updateUser(req, res, next) {
 
-    let update = {}
 
-    if(req.body.username)
-        update.local = { username: req.body.username }
-    if(req.body.password)
-        if(!update.local)
-            update.local = { password: req.body.password }
-        else
-            update.local.password = req.body.password
+    if(req.body.username && req.body.username !== "" && req.body.username !== res.dbUser.local.username)
+        res.dbUser.local.username = req.body.username
+    if(req.body.password && req.body.password !== "")
+        res.dbUser.local.password = req.body.password
     if(req.body.roles)
-        update.roles = req.body.roles
-    if(req.body.firstname)
-        update.firstname = req.body.firstname
-    if(req.body.lastname)
-        update.lastname = req.body.lastname
+        res.dbUser.roles = req.body.roles
+    if(req.body.firstname && req.body.firstname !== "" && req.body.firstname !== res.dbUser.firstname)
+        res.dbUser.firstname = req.body.firstname
+    if(req.body.lastname && req.body.lastname !== "" && req.body.lastname !== res.dbUser.lastname)
+        res.dbUser.lastname = req.body.lastname
+        
+    
 
-    User.findByIdAndUpdate(req.params.userId, update)
+    res.dbUser.save()
         .then(({_id, firstname, lastname }) => {
             res.status(201).json({_id, firstname, lastname })
         })

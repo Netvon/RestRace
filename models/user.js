@@ -101,6 +101,9 @@ userSchema.statics.validateUsernamePassword = async function(username, password)
 }
 
 userSchema.methods.validatePassword = function(password) {
+    if(!this.local.password)
+        return false
+
     return bcrypt.compareSync(password, this.local.password)
 }
 

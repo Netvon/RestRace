@@ -157,7 +157,7 @@ function useLocal(app) {
 					done(null, null, req.flash('danger', 'Signin failed'))
 
 			} catch (error) {
-				done(err, null, req.flash('danger', 'Signin failed'))
+				done(error, null, req.flash('danger', 'Signin failed'))
 			}
 		}
 	))
