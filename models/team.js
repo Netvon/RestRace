@@ -49,15 +49,24 @@ let defaultTeamNames = [
 ]
 
 let defaultProjection = '_id name users ranking endtime'
+let defaultPopulation = [{
+    path: 'users',
+    model: 'User',
+    select: '_id local.username races'
+},{
+    path: 'ranking.pub',
+    model: 'Pub',
+    select: '_id name'
+}]
 
 teamSchema.statics.findAll = function() {
     return this.find({}, defaultProjection)
-               .populate("users", "local.username races")
+               .populate(defaultPopulation)
 }
 
 teamSchema.statics.findSingleById = function(_id) {
     return this.findOne({_id}, defaultProjection)
-               .populate("users", "local.username races")
+               .populate(defaultPopulation)
 }
 
 teamSchema.methods.addUser = function(userId) {
@@ -86,14 +95,25 @@ teamSchema.statics.findAndAddRanking = function (_id, pubIds) {
 
     return new Promise((resolve, reject) => {
         this.findOne({_id}, defaultProjection)
-            .populate("users", "firstname lastname races")
+            .populate(defaultPopulation)
             .then(team => {
                 pubIds.forEach(function (item, index) {
-                    team.ranking.push({pub:item, time:new Date()})
+
+                    var alreadyRanked = false;
+                    team.ranking.forEach(function (rank, index) {
+                        if(rank.pub._id.equals(item)){
+                            alreadyRanked = true;
+                        }
+                    })
+                    if(!alreadyRanked){
+                        team.ranking.push({pub:item, time:new Date()})
+                    }
                 })
 
                 team.save(function(err, team) {
-                    resolve(team)
+                    team.populate(defaultPopulation, function (err, team) {
+                        resolve(team)
+                    })
                 })
                     .catch(err => reject(err))
 
