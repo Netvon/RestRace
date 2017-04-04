@@ -13,8 +13,8 @@ function paginate(req, res, next) {
 			let prev = req.skip - req.limit
 			let next = req.skip + req.limit
 
-			let nextUrl = `${req.baseUrl}?limit=${req.limit}&skip=${next}`
-			let prevUrl = `${req.baseUrl}?limit=${req.limit}&skip=${prev}`
+			let nextUrl = `${req.originalUrl}?limit=${req.limit}&skip=${next}`
+			let prevUrl = `${req.originalUrl}?limit=${req.limit}&skip=${prev}`
 
 			if(req.query.sort) {
 				nextUrl += `&sort=${req.query.sort}`

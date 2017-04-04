@@ -305,7 +305,90 @@ describe('Users', () => {
 					}
 				})
 		})
+
+		it('It should GET one user', done => {
+			chai.request(server)
+				.get('/api/users/58dbbd956527e80c98651e45')
+				.end((err, res) => {
+					if(err) {
+						done(err)
+					} else {
+						expect(res.body).to.not.be.an('array')
+						expect(res).to.have.status(200)
+
+						done()
+					}
+				})
+		})
+
+		it('It should not GET user that does not exist', done => {
+			chai.request(server)
+				.get('/api/users/58dbbd956527e80c98651f45')
+				.end((err, res) => {
+					expect(res.body).to.not.be.an('array')
+					expect(res).to.have.status(404)
+
+					done()
+				})
+		})
 		
+		it('It should not allow POST without a body', done => {
+			chai.request(server)
+				.post('/api/users/')
+				.end((err, res) => {
+					expect(res.body).to.not.be.an('array')
+					expect(res).to.have.status(400)
+
+					done()
+				})
+		})
+
+		it('It should not allow POST without a password', done => {
+			chai.request(server)
+				.post('/api/users/')
+				.send({ username: 'Netvon' })
+				.end((err, res) => {
+					expect(res.body).to.not.be.an('array')
+					expect(res).to.have.status(400)
+
+					done()
+				})
+		})
+
+		let theID = ''
+
+		it('It should POST', done => {
+			chai.request(server)
+				.post('/api/users/')
+				.send({ username: 'New User', password: 'Password' })
+				.end((err, res) => {
+					expect(res.body).to.not.be.an('array')
+					expect(res).to.have.status(201)
+					expect(res.body).to.have.property('_id')
+
+					theID = res.body._id
+
+					done()
+				})
+		})
+
+		it('It hould find User by name', done => {
+			chai.request(server)
+				.get('/api/users?filter=$m:local.username:new user&fields=_id')
+				.end((err, res) => {
+					expect(res.body).to.be.an('array').with.length(1)
+					done(err)
+				})
+		})
+
+		it('It should DELETE', done => {
+			chai.request(server)
+				.del('/api/users/' + theID)
+				.end((err, res) => {
+					expect(res).to.have.status(200)
+					done(err)
+				}) 
+		})
 
 		it('It should paginate GET all users', done => {
 			chai.request(server)

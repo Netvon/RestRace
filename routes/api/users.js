@@ -16,7 +16,7 @@ router.param('userId', async (req, res, next, userId) => {
         res.dbUser = await db
 
         if(res.dbUser == null)
-            next(new NotFoundError(`User with id ${raceId} not found`))
+            next(new NotFoundError(`User with id ${userId} not found`))
         else {
             next()
         }
