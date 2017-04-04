@@ -85,7 +85,7 @@ function addRace(req, res, next) {
 
 				if(req.body.teams) {
 					req.body.teams.forEach(teamName => {
-						allPromises.push(race.addNewTeam(teamName))
+						allPromises.push(race.addNewTeam(teamName, false))
 					})
 				}
 
