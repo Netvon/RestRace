@@ -244,7 +244,7 @@ function getRankingImage(req, res, next) {
 
 // GET /api/races
 // GET /api/races/:raceId
-router.get('/:raceId?', combineAuth, ...qh.all(), getRaces)
+router.get('/:raceId?', isJWTAuthenticated, ...qh.all(), getRaces)
 
 router.get('/:raceId/getuserteam', isJWTAuthenticated, getUserTeam)
 
