@@ -114,6 +114,22 @@ function filterable(req, res, next) {
 					case '$e':
 						db = db.where(steps[1], steps[2])
 						break
+
+					case '$gt':
+						db = db.where(steps[1]).gt(steps[2])
+						break
+
+					case '$gte':
+						db = db.where(steps[1]).gte(steps[2])
+						break
+
+					case '$lt':
+						db = db.where(steps[1]).lt(steps[2])
+						break
+
+					case '$lte':
+						db = db.where(steps[1]).lte(steps[2])
+						break
 				}
 			}
 		}

@@ -1,5 +1,4 @@
 const	mongoose	= require('mongoose'),
-        slug		= require('mongoose-document-slugs'),
         Schema		= mongoose.Schema;
 
 var teamSchema = new mongoose.Schema({

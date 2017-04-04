@@ -1,5 +1,4 @@
 const	mongoose	= require('mongoose'),
-		slug		= require('mongoose-document-slugs'),
 		Schema		= mongoose.Schema,
 	{ NotFoundError, ValidationError, UnauthorizedError } = require('./errors')
 
@@ -111,7 +110,7 @@ raceSchema.methods.addNewTeam = function(teamName) {
 
     return Team.createWithNameOrDefaultName(teamName)
         .then(newTeam => {
-            this.teams.push(newTeam._id)
+            this.teams.push(newTeam)
 
             return this.save()
         })
@@ -196,7 +195,5 @@ raceSchema.methods.getUserTeam = function(raceId, userId) {
         reject(new NotFoundError(`Team with user ${userId} not found`))
     })
 }
-
-raceSchema.plugin(slug, { sourceField: 'name' })
 
 module.exports = mongoose.model('Race', raceSchema)

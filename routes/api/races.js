@@ -177,8 +177,12 @@ function updateRace(req, res, next) {
 function addTeam(req, res, next){
 
 	res.race.addNewTeam(req.body.name)
-		.then(x => res.status(201).json(x))
-		.catch(reason => next(reason))
+		.then(x => {
+			res.status(201).json(x)
+		})
+		.catch(reason => {
+			next(reason)
+		})
 
 }
 
