@@ -84,7 +84,7 @@ function addRace(req, res, next) {
 				let allPromises = []
 
 				req.body.teams.forEach(teamName => {
-					allPromises.push(race.addNewTeam(teamName))
+					allPromises.push(race.addNewTeam(teamName, false))
 				})
 				req.body.pubs.forEach(pub => {
 					allPromises.push(race.addNewPub(pub.place_id))

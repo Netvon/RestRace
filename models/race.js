@@ -104,7 +104,7 @@ raceSchema.methods.updateWith = function(object) {
 	return this.save()
 }
 
-raceSchema.methods.addNewTeam = function(teamName) {
+raceSchema.methods.addNewTeam = function(teamName, returnrace=true) {
 
     let Team = require('./team')
 
@@ -114,7 +114,15 @@ raceSchema.methods.addNewTeam = function(teamName) {
                 this.teams.push(newTeam)
 
                 this.save()
-                    .then(ok => resolve(newTeam))
+                    .then(ok => {
+                        if(returnrace){
+                            resolve(this)
+                        }
+                        else{
+                            resolve(newTeam)
+                        }
+
+                    })
                     .catch(err => reject(err))
             })
             .catch(err => reject(err))
