@@ -4,12 +4,15 @@
 			<div v-for="message in messages">
 				<div class="message is-info">
 					<div class="message-header">
-						<p>{{ message.type }} <span class="tag" v-if="message.val.error.status">{{ message.val.error.status}}</span></p>
+						<p>{{ message.type }} <span class="tag" v-if="message.val.error">{{ message.val.error.status}}</span></p>
 					</div>
 					<div class="message-body">
-						<p>{{ message.val.error.message }}</p>
-						<figure class="highlight" v-if="message.val.error.stack">
+						<p v-if="message.val.error">{{ message.val.error.message }}</p>
+						<figure class="highlight" v-if="message.val.error">
 							<pre><code>{{ message.val.error.stack }}</code></pre>
+						</figure>
+						<figure class="highlight" v-if="message.type === 'request-log'">
+							<pre><code>{{ message.val }}</code></pre>
 						</figure>
 					</div>
 				</div>				
@@ -38,6 +41,10 @@ export default {
 
 		"race-resolved": function(val) {
 			this.messages.push({type: 'race-resolved', val })
+		},
+
+		"request-log": function(val) {
+			this.messages.push({type: 'request-log', val })
 		},
 
 		error: function(val) {

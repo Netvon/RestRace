@@ -19,6 +19,13 @@ connectDb('rest-race').catch(console.log)
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
 
+app.use((req, res, next) => {
+	let { realtime } = require('./helpers/realtime')
+	realtime.send('request-log', { method: req.method, url: req.url, ip: req.ip, headers: req.headers})
+
+	next()
+})
+
 // setup middleware
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
