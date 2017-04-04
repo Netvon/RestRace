@@ -108,12 +108,18 @@ raceSchema.methods.addNewTeam = function(teamName) {
 
     let Team = require('./team')
 
-    return Team.createWithNameOrDefaultName(teamName)
-        .then(newTeam => {
-            this.teams.push(newTeam)
+    return new Promise((resolve, reject) => {
+        Team.createWithNameOrDefaultName(teamName)
+            .then(newTeam => {
+                this.teams.push(newTeam)
 
-            return this.save()
-        })
+                this.save()
+                    .then(ok => resolve(newTeam))
+                    .catch(err => reject(err))
+            })
+            .catch(err => reject(err))
+
+    })
 
 	// return new Promise((resolve, reject) => {
 	// 	require('./team').createWithNameOrDefaultName(teamName)
