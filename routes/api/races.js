@@ -49,8 +49,8 @@ async function getRaces(req, res, next) {
 	} else {
 
 		try {
-			let races = await qh.applyToDb(req, Race.findAll(req.fields))
-			res.paginate(races, await Race.count())
+			let races = await qh.applyToDb(req, req.applyFilters(Race.findAll(req.fields)))
+			res.paginate(races, await req.applyFilters(Race.findAll(req.fields)).count())
 		} catch (error) {
 			next(error)
 		}        

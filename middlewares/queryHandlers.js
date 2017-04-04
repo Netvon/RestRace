@@ -108,7 +108,11 @@ function filterable(req, res, next) {
 						break
 
 					case '$m':
-						db = db.where(steps[1], new RegExp(`/^${steps[2]}/`, 'i'))
+						db = db.where(steps[1], new RegExp(steps[2], 'i'))
+						break
+
+					case '$e':
+						db = db.where(steps[1], steps[2])
 						break
 				}
 			}

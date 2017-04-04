@@ -41,8 +41,8 @@ async function getTeams(req, res, next) {
     } else {
 
         try {
-            let teams = await qh.applyToDb(req, Team.findAll(req.fields))
-            res.paginate(teams, await Team.count())
+            let teams = await qh.applyToDb(req, req.applyFilters(Team.findAll(req.fields)))
+            res.paginate(teams, await req.applyFilters(Team.findAll(req.fields)).count())
         } catch (error) {
             next(error)
         }        

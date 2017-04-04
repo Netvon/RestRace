@@ -58,7 +58,7 @@ userSchema.pre('save', function(next) {
     next()
 })
 
-const defaultProjection = '_id fullName local.username roles'
+const defaultProjection = '_id fullName local.username roles firstname lastname'
 
 userSchema.statics.findAll = function(projection = defaultProjection, populateOptions = '') {
     if(populateOptions == null)

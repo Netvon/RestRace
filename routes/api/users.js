@@ -35,8 +35,8 @@ async function getUsers(req, res, next) {
         res.json(res.dbUser)
     } else {
         try {
-            let users = await qh.applyToDb(req, User.findAll(req.fields))
-            res.paginate(users, await User.count())        
+            let users = await qh.applyToDb(req, req.applyFilters(User.findAll(req.fields)))
+            res.paginate(users, await req.applyFilters(User).count())        
         } catch (error) {
             next(error)
         }
