@@ -91,8 +91,6 @@ function skippable(req, res, next) {
 }
 
 function filterable(req, res, next) {
-	req.filter = []
-
 	req.applyFilters = (db) => {
 		if(req.query.filter) {
 			let filterArgs = req.query.filter.split(',')
@@ -119,6 +117,7 @@ function filterable(req, res, next) {
 		return db
 	}
 
+	next()
 	
 }
 
@@ -140,6 +139,7 @@ module.exports.sortable = sortable
 module.exports.projectable = projectable
 module.exports.limitable = limitable
 module.exports.skippable = skippable
+module.exports.filterable = filterable
 module.exports.all = () => {
 	return [
 		sortable,
