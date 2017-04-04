@@ -114,10 +114,52 @@ function searchUsers(req, res) {
 
 }
 
+async function getOwnedRacesForCurrentUser(req, res, next) {
+    let Race = require('../../models/race')
+
+    try{
+        let dbCall = Race.findByCreator(req.user._id, req.fields)
+        let count = await Race.findByCreator(req.user._id, req.fields).count()
+        let races = await qh.applyToDb(req, dbCall)
+
+        res.paginate(races, count)
+    } catch(error) {
+        next(error)
+    }
+}
+
+async function getJoinedRacesForCurrentUser(req, res, next) {
+    let Race = require('../../models/race')
+    let Team = require('../../models/team')
+
+    try {
+        let teamIds = await Team.find({ users: req.user._id }, '_id', { lean:  true })
+        let races = await qh.applyToDb(req, Race.findByTeamIds(teamIds, req.fields))
+        let count = await Race.findByTeamIds(teamIds, req.fields).count()
+
+        res.paginate(races, count)
+
+    } catch (error) {
+        next(error)
+    }
+    
+
+    // try{
+    //     let dbCall = Race.find({ owner: req.user._id })
+    //     let races = await qh.applyToDb(req, dbCall)
+    //     res.paginate(races, await dbCall.count())
+    // } catch(error) {
+    //     next(error)
+    // }
+}
+
 
 // GET /api/users
 // GET /api/users/:userId
 router.get('/:userId?'/*, isJWTAuthenticated, isInRole('admin')*/, ...qh.all(), getUsers)
+
+router.get('/me/races/owner', isJWTAuthenticated, ...qh.all(), getOwnedRacesForCurrentUser)
+router.get('/me/races/joined', isJWTAuthenticated, ...qh.all(), getJoinedRacesForCurrentUser)
 
 router.get('/search/:searchText', searchUsers)
 

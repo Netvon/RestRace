@@ -77,6 +77,14 @@ raceSchema.statics.findSingle = function(params, projection = defaultProjection,
 	return this.findOne(params, projection).populate(populateOptions)
 }
 
+raceSchema.statics.findByCreator = function(userId, projection = defaultProjection, populateOptions = defaultPopulate) {
+    return this.find({ creator: userId }, projection).populate(populateOptions)
+}
+
+raceSchema.statics.findByTeamIds =  function(teamIds, projection = defaultProjection, populateOptions = defaultPopulate) {
+    return this.find({teams: { $in: teamIds }}, projection).populate(populateOptions)   
+}
+
 raceSchema.methods.updateWith = function(object) {
 	
     if(object.name && object.name !== "" && object.name !== this.name)
