@@ -55,18 +55,17 @@ paths:
     get:
       summary: All Races
       description: |
-        Returns a race
+        Returns all Races. Results can be paginated when the 'limit' parameter is specified.
       parameters:
         - name: limit
           in: query
           type: integer
-          minimum: 0
-          default: 0
+          maximum: 100
+          description: The number of items to return per page.
         - name: skip
           in: query
           type: integer
-          minimum: 0
-          default: 0
+          description: The number of items to to skip. This should be a multiple of the 'limit' parameter
         - name: fields
           in: query
           description: The Fields to display. Each field is separated by a comma.
@@ -74,6 +73,7 @@ paths:
         - name: sort
           in: query
           type: string
+          description: The fields to sort the returned items on. Fields can be prefixed with a '-' to sort in reverse order. Each field is separated by a comma.
       tags:
         - Races
       responses:
@@ -104,7 +104,79 @@ paths:
               $ref: '#/definitions/Race'
         default:
           description: Unexpected error
-
+          
+  /users:
+    get:
+      summary: All Users
+      description: |
+        Returns all User. Results can be paginated when the 'limit' parameter is specified.
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          maximum: 100
+          description: The number of items to return per page.
+        - name: skip
+          in: query
+          type: integer
+          description: The number of items to to skip. This should be a multiple of the 'limit' parameter
+        - name: fields
+          in: query
+          description: The Fields to display. Each field is separated by a comma.
+          type: string
+        - name: sort
+          in: query
+          type: string
+          description: The fields to sort the returned items on. Fields can be prefixed with a '-' to sort in reverse order. Each field is separated by a comma.
+      tags:
+        - Users
+      responses:
+        200:
+          description: OK
+          schema:
+              $ref: '#/definitions/PaginatedUsersResponse'
+        default:
+          description: Unexpected error
+          
+    post:
+      summary: Register a new Users
+        
+      parameters:
+        - name: user
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/RegisterUser'
+          
+      tags:
+        - Users
+        
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+            
+  /../auth/users:
+     post:
+      summary: Get a Token
+        
+      parameters:
+        - name: tokenRequest
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/TokenRequest'
+          
+      tags:
+        - Users
+        
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/TokenResponse'
+        
 definitions:
   RacePost:
     type: object
@@ -171,10 +243,75 @@ definitions:
       _id:
         type: string
         
+  User:
+    type: object
+    properties:
+      _id:
+        type: string
+      roles:
+        type: array
+        items:
+          type: string
+      local:
+        type: object
+        properties:
+          username:
+            type: string
+          password:
+            type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+            
+  RegisterUser:
+    type: object
+    properties:
+      roles:
+        type: array
+        items:
+          type: string
+      username:
+        type: string
+      password:
+        type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+    required:
+      - username
+      - password
+      
+  TokenRequest:
+    type: object
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+    required:
+      - username
+      - password
+      
+  TokenResponse:
+    type: object
+    properties:
+      message:
+        type: string
+      token:
+        type: string
+    required:
+      - message
+      - token
+        
+        
   PaginatedResponse:
     type: object
     properties:
       totalPages:
+        type: integer
+      currentPage:
         type: integer
       totalItems:
         type: integer
@@ -185,8 +322,12 @@ definitions:
       next:
         type: string
         format: url
+      prev:
+        type: string
+        format: url
     required:
       - totalPages
+      - currentPage
       - totalItems
       - limit
       - skip
@@ -200,6 +341,16 @@ definitions:
             type: array
             items:
                $ref: '#/definitions/Race'
+               
+  PaginatedUsersResponse:
+    allOf:
+      - $ref: '#/definitions/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+               $ref: '#/definitions/User'
       
           
   NotFoundError:
