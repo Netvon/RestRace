@@ -83,12 +83,17 @@ function addRace(req, res, next) {
 			if(req.body.teams || req.body.pubs) {
 				let allPromises = []
 
-				req.body.teams.forEach(teamName => {
-					allPromises.push(race.addNewTeam(teamName, false))
-				})
-				req.body.pubs.forEach(pub => {
-					allPromises.push(race.addNewPub(pub.place_id))
-				})
+				if(req.body.teams) {
+					req.body.teams.forEach(teamName => {
+						allPromises.push(race.addNewTeam(teamName, false))
+					})
+				}
+				
+				if(req.body.pubs) {
+					req.body.pubs.forEach(pub => {
+						allPromises.push(race.addNewPub(pub.place_id))
+					})
+				}
 
 				Promise.all(allPromises)
 					.then(ok => {

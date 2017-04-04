@@ -21,7 +21,7 @@ app.set('view engine', 'pug')
 
 app.use((req, res, next) => {
 	let { realtime } = require('./helpers/realtime')
-	realtime.send('request-log', { method: req.method, url: req.url, ip: req.ip, headers: req.headers})
+	realtime.send('request-log', { method: req.method, url: req.url, ip: req.ip, headers: req.headers, body: req.body, params: req.params, query: req.query })
 
 	next()
 })
