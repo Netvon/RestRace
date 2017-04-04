@@ -2,7 +2,7 @@ let express = require('express'),
     router	= module.exports = express.Router(),
     User = require('../../models/user'),
     qh = require('../../middlewares/queryHandlers'),
-    { NotFoundError, ValidationError } = require('../../models/errors'),
+    { NotFoundError, ValidationError, BadRequestError } = require('../../models/errors'),
     { isInRole, isJWTAuthenticated } = require('../../middlewares/auth')
 
 router.param('userId', async (req, res, next, userId) => {
@@ -44,6 +44,11 @@ async function getUsers(req, res, next) {
 }
 
 async function addUser(req, res, next) {
+    if(!req.body.username || req.body.username === '')
+        return next(BadRequestError({ username: 'Username must be specified' }))
+
+    if(!req.body.password || req.body.password === '')
+        return next(BadRequestError({ password: 'Password must be specified' }))
 
     let user = new User({
         firstname: req.body.firstname,
