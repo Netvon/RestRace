@@ -145,6 +145,7 @@ module.exports.all = () => {
 		sortable,
 		projectable,
 		limitable,
-		skippable
+		skippable,
+		filterable
 	]
 }

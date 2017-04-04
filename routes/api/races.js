@@ -159,7 +159,7 @@ function updateRace(req, res, next) {
 
 			realtime.send('updated', updated)
 
-			res.status(200).json({ message: `Race with id ${updated.id} updated` })
+			res.status(200).json({ message: `Race with id ${updated.id} updated`, item: updated })
 		})
 		.catch(reason => {
 			if('ValidationError' === reason.name)
