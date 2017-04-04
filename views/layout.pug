@@ -26,8 +26,19 @@ html
 				if notifications
 					each messages, level in notifications
 						div(class= 'notification is-' +  level)= messages
-						
-				block content
+				
+				if user && user.roles.includes('admin')
+					div(class= 'columns')
+						div(class= 'column is-one-quarter')
+							aside(class= 'menu')
+								p(class= 'label')= 'Admin'
+								ul(class= 'menu-list')
+									li
+										a(href= '/admin/users')= 'Users Overview'
+						div(class= 'column')
+							block content
+				else
+					block content
 
 		footer(class= 'footer')
 			div(class= 'container')
