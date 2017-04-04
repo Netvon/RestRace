@@ -1,7 +1,5 @@
-process.env.FACEBOOK_CLIENT_ID = '1954358709511840'
-process.env.FACEBOOK_CLIENT_SECRET = '6d987d5829ec9620655894d2c86f1f32'
-
-let mongoose = require('mongoose')
+process.env.FACEBOOK_CLIENT_ID = '-'
+process.env.FACEBOOK_CLIENT_SECRET = '-'
 
 let chai = require('chai')
 let chaiHttp = require('chai-http')
@@ -11,8 +9,17 @@ let expect = chai.expect
 
 let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1OGRiYmQ5NTY1MjdlODBjOTg2NTFlNDUiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJpYXQiOjE0OTEzMTY0MTQsImV4cCI6MTQ5MTQwMjgxNH0.v9KahwdKjzLBgIOXFu5xqPd5y-mKUu-qzCZGauR1fEc'
 
-
 chai.use(chaiHttp)
+
+before('Get Fresh Token',  () => {
+	chai.request(server)
+		.post('/auth/token')
+		.send({ username: "netvon", password: 'password'})
+		.end((err, res) => {
+			token = res.body.token
+			done(err)
+		})
+})
 
 describe('Model Tests', () => {
 	describe('User', () => {
@@ -23,9 +30,71 @@ describe('Model Tests', () => {
 			user.roles = ['lol', 'hallo']
 
 			let errors = user.validateSync('roles')
-			console.log(errors)
+			expect(errors).to.not.be.null
 
 			done()
+		})
+
+		it('It should hash password after save & have default role', done => {
+			let User = require('../models/user')
+
+			let user = new User()
+			user.local = { username: (new Date()).toLocaleString(), password: 'hallo' }
+
+			user.save()
+				.then(doc => {
+					expect(doc.local.password).to.not.equal('hallo')
+					expect(doc.roles).to.include('user')
+
+					User.findByIdAndRemove(doc._id).exec()
+
+					done()
+				})
+				.catch(done)
+		})
+
+		it('It should have correct fullname Virtual', done => {
+			let User = require('../models/user')
+
+			let user = new User()
+			user.firstname = 'Tom'
+			user.lastname = 'van Nimwegen'
+
+			expect(user.fullName).to.be.equal('Tom van Nimwegen')
+			done()
+		})
+
+		it('It should not have facebook by default', done => {
+			let User = require('../models/user')
+
+			let user = new User()
+
+			expect(user.hasFacebook).to.be.false
+			done()
+		})
+
+		it('It should always invalidate login when nothing is passed', async () => {
+			let User = require('../models/user')
+
+			let result = await User.validateUsernamePassword(undefined, '')
+
+			expect(result).to.be.false
+		})
+	})
+
+	describe('Teams', () => {
+		it('It Should update a team from an object', async () => {
+			let Team = require('../models/team.js')
+
+			let team = await Team.create({ name: "A Brand New Team" })
+			team = await team.updateWith({ name: "A Brand New Team, pt. 2" })
+
+			expect(team.name).to.be.equal("A Brand New Team, pt. 2")
+
+			team = await team.updateWith({ endtime: "01-01-2018 12:34" })
+
+			expect(team.name).to.be.equal("A Brand New Team, pt. 2")
+			expect(team.endtime).to.not.be.null
 		})
 	})
 })
@@ -127,7 +196,6 @@ describe('Race', () => {
 					if(err) {
 						done(err)
 					} else {
-						console.log(res)
 						expect(res.body).to.be.an('object')
 						expect(res.body).to.have.property('_id').which.equals('58c02042768dc92a584d1c1b')
 						expect(res).to.have.status(200)
@@ -143,18 +211,36 @@ describe('Race', () => {
 				.get('/api/races?limit=10')
 				.set('Authorization', `JWT ${token}`)
 				.end((err, res) => {
-					if(err)
-						done(err)
 
 					expect(res.body).to.not.be.an('array')
 					expect(res.body).to.be.an('object')
 					expect(res.body).to.have.property('limit').which.equals(10)
 					expect(res.body).to.have.property('skip')
+					expect(res.body).to.have.property('next')
 					expect(res.body).to.have.property('totalPages')
 					expect(res.body).to.have.property('currentPage')
 
 					expect(res).to.have.status(200)
-					done()
+					done(err)
+				})
+		})
+
+		it('It should paginate GET all races and go to the next page', done => {
+			chai.request(server)
+				.get('/api/races?limit=10&skip=10')
+				.set('Authorization', `JWT ${token}`)
+				.end((err, res) => {
+
+					expect(res.body).to.not.be.an('array')
+					expect(res.body).to.be.an('object')
+					expect(res.body).to.have.property('limit').which.equals(10)
+					expect(res.body).to.have.property('skip').which.equals(10)
+					expect(res.body).to.have.property('prev')
+					expect(res.body).to.have.property('totalPages')
+					expect(res.body).to.have.property('currentPage')
+
+					expect(res).to.have.status(200)
+					done(err)
 				})
 		})
 	})
