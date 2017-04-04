@@ -4,7 +4,7 @@ const	mongoose	= require('mongoose'),
 
 var GooglePlaces = require('google-places');
 // api key
-var places = new GooglePlaces('AIzaSyBNXXpKe8sc-_LIXSP6vdpdxDA3Tiz-p-E');
+var places = new GooglePlaces(process.env.GOOGLE_PLACES_KEY);
 
 var raceSchema = new mongoose.Schema({
 	name: { type: String, required: true},

@@ -9,7 +9,7 @@ const   express     = require('express'),
 		{isJWTAuthenticated, combineAuth} = require('../../middlewares/auth'),
 		{ NotFoundError, ValidationError, UnauthorizedError } = require('../../models/errors'),
 		GooglePlaces = require('google-places'),
-		places = new GooglePlaces('AIzaSyDTnFknpxRhzZHkCegKD0IhjfYWxb-WU14')
+		places = new GooglePlaces(process.env.GOOGLE_PLACES_KEY)
 
 router.param('raceId', (req, res, next, raceId) => {
 	qh.projectable(req, res, () => {})
@@ -88,7 +88,7 @@ function addRace(req, res, next) {
 						allPromises.push(race.addNewTeam(teamName))
 					})
 				}
-				
+
 				if(req.body.pubs) {
 					req.body.pubs.forEach(pub => {
 						allPromises.push(race.addNewPub(pub.place_id))

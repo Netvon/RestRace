@@ -9,7 +9,7 @@ pubSchema = new mongoose.Schema({
 
 var GooglePlaces = require('google-places');
 // api key
-var places = new GooglePlaces('AIzaSyBNXXpKe8sc-_LIXSP6vdpdxDA3Tiz-p-E');
+var places = new GooglePlaces(process.env.GOOGLE_PLACES_KEY);
 
 
 
