@@ -26,6 +26,11 @@ function paginate(req, res, next) {
 				prevUrl += `&fields=${req.query.fields}`
 			}
 
+			if(req.query.filter) {
+				nextUrl += `&filter=${req.query.filter}`
+				prevUrl += `&filter=${req.query.filter}`
+			}
+
 			if(next >= totalItems)
 				nextUrl = undefined
 
