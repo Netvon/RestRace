@@ -144,7 +144,7 @@ function deleteRace(req, res, next) {
 
 function updateRace(req, res, next) {
 
-	if(req.user.roles.includes('admin') || req.user.id  === res.race.owner.id ) {
+	if(req.user.roles.includes('admin') || req.user.id  === res.race.creator.id ) {
 
 		res.race.updateWith(req.body)
 

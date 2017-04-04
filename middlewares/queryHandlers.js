@@ -90,6 +90,38 @@ function skippable(req, res, next) {
 	next()
 }
 
+function filterable(req, res, next) {
+	req.filter = []
+
+	req.applyFilters = (db) => {
+		if(req.query.filter) {
+			let filterArgs = req.query.filter.split(',')
+
+			for(let filter of filterArgs) {
+				let steps = filter.split(':')
+
+				switch(steps[0]) {
+					case '$i':
+						db = db.where(steps[1]).in(steps[2].split('|'))
+						break
+
+					case '$ni':
+						db = db.where(steps[1]).nin(steps[2].split('|'))
+						break
+
+					case '$m':
+						db = db.where(steps[1], new RegExp(`/^${steps[2]}/`, 'i'))
+						break
+				}
+			}
+		}
+
+		return db
+	}
+
+	
+}
+
 function applyToDb(req, db) {
 	if(req.sortFields)
 		db = db.sort(req.sortFields)
